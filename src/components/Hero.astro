@@ -29,5 +29,6 @@ const { title, description } = Astro.props;
   @media (max-width: 47.5rem) {
     :global(#hero) { padding-block: 3rem 2.5rem; }
     .hero { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+    .hero > :global(.hero-vis) { display: none; }
   }
 </style>
