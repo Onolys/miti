@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { partnerLine, team } from '../data/team';
+import { team } from '../data/team';
 import Section from './Section.astro';
 import CtaButton from './CtaButton.astro';
 ---
@@ -21,7 +21,6 @@ import CtaButton from './CtaButton.astro';
       ))}
     </div>
   </div>
-  <p class="partners">{partnerLine.map((part) => <>{part.breakBefore && <br class="desktop-break" />}{part.bold ? <strong>{part.text}</strong> : part.text}</>)}</p>
   <div class="cta-row"><CtaButton trigger="team" /></div>
 </Section>
 
@@ -36,10 +35,6 @@ import CtaButton from './CtaButton.astro';
   .linkedin { margin-top: auto; width: 34px; height: 34px; border-radius: 8px; border: 1px solid #d5ebe8; background: var(--color-gray-50); display: flex; align-items: center; justify-content: center; color: var(--color-accent); }
   .linkedin:hover { background: #d5ebe8; }
   .linkedin svg { width: 18px; height: 18px; }
-  .partners { text-align: center; max-width: 46rem; margin: 2rem auto 0; color: var(--color-gray-600); font-size: 0.95rem; }
-  .desktop-break { display: none; }
-  @media (min-width: 768px) { .desktop-break { display: inline; } }
-  .partners strong { color: var(--color-text); font-weight: 700; }
   .cta-row { display: flex; justify-content: center; margin-top: var(--space-8); }
   @container (max-width: 639px) {
     .cards { grid-template-columns: 1fr; gap: 0.75rem; }

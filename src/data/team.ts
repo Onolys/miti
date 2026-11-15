@@ -36,22 +36,3 @@ export const team: TeamMember[] = [
     photo: frederique,
   },
 ];
-
-export interface TextSegment {
-  text: string;
-  bold?: boolean;
-  /** Render a line break before this segment on desktop only. */
-  breakBefore?: boolean;
-}
-
-/** Structured so the institution names render bold without raw HTML. */
-export const partnerLine: readonly TextSegment[] = [
-  { text: 'Backed by researchers from ' },
-  { text: 'Harvard Medical School', bold: true },
-  { text: ', ' },
-  { text: 'Columbia Medical Center', bold: true },
-  { text: ' ' },
-  { text: 'and ', breakBefore: true },
-  { text: 'Massachusetts General Hospital', bold: true },
-  { text: '.' },
-];
