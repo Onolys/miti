@@ -63,14 +63,14 @@ test('desktop comparison table has the new rows, values and column widths', asyn
   const table = page.locator('#compare table');
   await expect(table).toBeVisible();
   await expect(page.locator('#compare [data-compare-mobile]')).toBeHidden();
-  await expect(table.locator('thead th')).toHaveText(['Criterion', 'Human MITI coding', 'AI practice chatbots', 'Onolys']);
+  await expect(table.locator('thead th')).toHaveText(['Criterion', 'Human MITI coding', 'Practice simulators', 'Onolys']);
   await expect(table.locator('tbody th')).toHaveText(['Your own session', 'Full MITI 4.2.1 coding', 'Evidence for every score', 'Session length', 'Cost', 'Turnaround']);
   await expect(table.locator('tbody [data-value]')).toHaveText([
-    'Yes', 'No, a simulated chat', 'Yes',
-    'Yes', 'No, "MITI-informed"', 'Yes',
+    'Yes', 'Simulated client', 'Yes',
+    'Yes', 'Varies', 'Yes',
     'Sometimes', 'Rarely', 'Yes',
     'Full session', 'Limited, short chats', 'Full session',
-    '$40–$80 per session', 'Expensive subscriptions', 'Low (pricing coming soon)',
+    '$40–$80 per session', 'Monthly subscription', 'Low (pricing coming soon)',
     'About 1 to 2 weeks', '—', 'Minutes',
   ]);
   const widths = await table.locator('thead th').evaluateAll((cells) => cells.map((cell) => cell.getBoundingClientRect().width));
@@ -158,7 +158,7 @@ test('390px: no horizontal scroll, compare tabs switch, compact team cards', asy
   }
   await expect(page.locator('#compare table')).toBeHidden();
   const cmp = page.locator('#compare [data-compare-mobile]');
-  await expect(cmp.getByRole('tab')).toHaveText(['Human coding', 'AI chatbots', 'Onolys']);
+  await expect(cmp.getByRole('tab')).toHaveText(['Human coding', 'Simulators', 'Onolys']);
   await assertTab(cmp, 'Onolys');
   const rows = cmp.locator('[role="tabpanel"]:visible [data-row]');
   await expect(rows).toHaveCount(6);
@@ -166,10 +166,10 @@ test('390px: no horizontal scroll, compare tabs switch, compact team cards', asy
   await cmp.getByRole('tab', { name: 'Human coding' }).click();
   await assertTab(cmp, 'Human coding');
   await expect(rows.nth(4)).toContainText('$40–$80 per session');
-  await cmp.getByRole('tab', { name: 'AI chatbots' }).focus();
+  await cmp.getByRole('tab', { name: 'Simulators' }).focus();
   await page.keyboard.press('ArrowRight');
   await assertTab(cmp, 'Onolys');
-  await cmp.getByRole('tab', { name: 'AI chatbots' }).click();
+  await cmp.getByRole('tab', { name: 'Simulators' }).click();
   await expect(rows.nth(5)).toContainText('—');
   const photo = await page.locator('#team article img').first().boundingBox();
   expect(photo!.width).toBeLessThanOrEqual(76);

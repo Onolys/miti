@@ -38,7 +38,8 @@ describe('learner landing page', () => {
     expect(panels.map((panel) => panel.id)).toEqual(['learner-features-panel-0', 'learner-features-panel-1', 'learner-features-panel-2']);
     expect(Array.from(doc.querySelectorAll('#features [role="tab"] .h')).map((h) => h.textContent)).toEqual(['See your full MITI score', 'Know why each score was given', 'Learn what to improve next']);
     expect(doc.querySelector('#evaluates')?.querySelectorAll('article')).toHaveLength(6);
-    expect(doc.querySelector('#compare h2')?.textContent).toBe('How it compares');
+    expect(doc.querySelector('#compare h2')?.textContent).toBe('Where Onolys fits');
+    expect(doc.querySelector('#compare .compare-intro')?.textContent).toBe('Practice simulators help you build skills; Onolys evaluates the sessions you run.');
     expect(doc.querySelector('#compare table')).not.toBeNull();
   });
 
