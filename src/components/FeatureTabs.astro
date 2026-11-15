@@ -1,0 +1,47 @@
+---
+interface Props { idPrefix?: string }
+// Explicit prefixes support predictable cross-component references. The default
+// also stays unique when a page renders more than one feature set.
+const { idPrefix = `learner-features-${crypto.randomUUID()}` } = Astro.props;
+const tabs = [
+  { key: 'evidence', label: 'Evidence' },
+  { key: 'complete', label: 'Complete' },
+  { key: 'feedback', label: 'Feedback' },
+];
+const tabId = (key: string) => `${idPrefix}-${key}-tab`;
+const panelId = (key: string) => `${idPrefix}-${key}-panel`;
+---
+<div class="feature-tabs" data-feature-tabs>
+  <div class="tablist" role="tablist" aria-label="Product features" aria-orientation="horizontal">
+    {tabs.map((tab, index) => (
+      <button type="button" role="tab" id={tabId(tab.key)} aria-controls={panelId(tab.key)} aria-selected={index === 0 ? 'true' : 'false'} tabindex={index === 0 ? 0 : -1}>{tab.label}</button>
+    ))}
+  </div>
+  <div class="panels">
+    <div role="tabpanel" id={panelId('evidence')} aria-labelledby={tabId('evidence')} tabindex="0"><slot name="evidence" /></div>
+    <div role="tabpanel" id={panelId('complete')} aria-labelledby={tabId('complete')} tabindex="0"><slot name="complete" /></div>
+    <div role="tabpanel" id={panelId('feedback')} aria-labelledby={tabId('feedback')} tabindex="0"><slot name="feedback" /></div>
+  </div>
+</div>
+
+<script>
+  import { initTabs } from '../lib/tabs';
+  initTabs();
+  document.addEventListener('astro:page-load', () => initTabs());
+</script>
+
+<style>
+  .feature-tabs { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); min-width: 0; }
+  .tablist { display: flex; flex-direction: row; align-items: stretch; gap: var(--space-2); min-width: 0; }
+  [role="tab"] { min-width: 0; flex: 1; min-height: 44px; padding: var(--space-2); font: inherit; font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text); background: var(--color-background); border: 1px solid var(--color-gray-300); border-radius: var(--space-2); cursor: pointer; overflow-wrap: anywhere; }
+  [role="tab"][aria-selected="true"] { color: var(--color-on-accent); background: var(--color-accent); border-color: var(--color-accent); }
+  [role="tab"]:focus-visible, [role="tabpanel"]:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+  .panels { display: grid; gap: var(--space-6); min-width: 0; }
+  [role="tabpanel"] { min-width: 0; }
+  [hidden] { display: none; }
+  @media (min-width: 768px) {
+    .feature-tabs { grid-template-columns: minmax(7rem, 9rem) minmax(0, 1fr); gap: var(--space-6); }
+    .tablist { flex-direction: column; align-self: start; }
+    [role="tab"] { flex: initial; text-align: start; padding: var(--space-3); }
+  }
+</style>
