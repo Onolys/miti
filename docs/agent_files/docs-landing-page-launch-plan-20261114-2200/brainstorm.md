@@ -40,6 +40,22 @@ Customer discovery for the Onolys MI evaluation (launch plan, Jira ONOLYS-72). B
 | Headlines as below | Doc options 2 to 4 | Claude's default, accepted |
 | Mockups are coded HTML built from a role-play we write | Real or licensed data | Claude's call: MI-TAGS/AnnoMI licences unconfirmed |
 | Pass/stop: under 2% sign-up after 300 visitors means rethink headline and example; 5%+ sign-up with half naming $5 or more is a pass; judge 30 Nov 2026 | Other thresholds | Tejit, from launch plan |
+| Team section is the last content section on both pages: 3 equal cards (photo, name, bio, LinkedIn icon), no title labels; bios as in the page spec | No team section; titled founder cards | Tejit |
+| Partner line wording: "Backed by researchers from Harvard Medical School, Columbia University Vagelos College of Physicians and Surgeons and Massachusetts General Hospital." (full institution names) | Shorter or looser wording | Tejit |
+| Q14 yes: `/enterprise` replaces the Evidence mockup with a coder-QC mockup (human coder's score next to our flag) | Same Evidence mockup on both pages | Tejit |
+| Q15 drop: no "Uploads are not used to train models." footer line | Keep the line | Tejit |
+| MITI fair/good thresholds to print: Technical 3/4, Relational 3.5/4, %CR 40%/50%, R:Q 1:1/2:1 | Other reference levels | Claude's call |
+| One fake role-play drives all mockups, with numbers consistent with MITI math | Separate examples per mockup | Claude's call |
+| US spelling throughout | Mixed spelling | Claude's call |
+| Enterprise Role list: Coding service lead, Coder, Trainer/supervisor, Program director, Researcher, Other | Learner role list | Claude's call |
+| The Enterprise pay question is per checked sample | Per evaluation | Claude's call |
+| GA events: popup_open, signup_step1, signup_step2, each with page + src. Pass/stop uses the learner page only | Other events; counting both pages | Claude's call |
+| Hero save failure: the popup still opens (its save creates the row) | Block the popup | Claude's call |
+| Sheet formula-injection guard | None | Claude's call |
+| `/enterprise` gets noindex; `www` redirects too | Indexed `/enterprise` | Claude's call |
+| Build happens in the miti repo on new branch `feat/landing-page` off main | Build in this docs branch | Claude's call |
+| Playwright e2e for the sign-up flow; unit tests for the Apps Script logic | Manual testing only | Claude's call |
+| "Done" means deployed; going live waits on owner steps | Done = merged | Claude's call |
 
 ## Design
 
@@ -47,8 +63,8 @@ Customer discovery for the Onolys MI evaluation (launch plan, Jira ONOLYS-72). B
 - Layout: top bar with the "Onolys" wordmark and a "Get early access" button (it opens the popup). Mobile first, loads fast, no stock photos.
 - Style: white background, dark text, one deep-teal accent, Inter throughout. Score chips use colour plus text.
 - After every section's content: a "Get early access" button that opens the popup.
-- Final CTA band: "Get early access" button with a "Questions?" link beside it (`mailto:tejitpabari99@gmail.com`).
-- Footer: "Not official MITI coding and cannot be submitted as one. Use it to practise and prepare. Role-play or de-identified transcripts only. Uploads are not used to train models." Then "Questions? Reach out to tejitpabari99@gmail.com", with the email as a mailto link. No policy links.
+- No separate final CTA band. The Team section (last content section, see below) carries the "Get early access" button with a "Questions?" link beside it (`mailto:tejitpabari99@gmail.com`).
+- Footer: "Not official MITI coding and cannot be submitted as one. Use it to practise and prepare. Role-play or de-identified transcripts only." Then "Questions? Reach out to tejitpabari99@gmail.com", with the email as a mailto link. No policy links.
 - `?src=` tag in the URL is captured and sent with every save.
 
 ### `/` (learners)
@@ -66,7 +82,12 @@ Customer discovery for the Onolys MI evaluation (launch plan, Jira ONOLYS-72). B
    5. Your own session: your real transcript, not a chat with a simulated client.
    6. Minutes, not weeks.
 4. **How it compares.** Columns: Human MITI coding | AI practice chatbots | Onolys. Rows: Your own session (Yes / No, a simulated chat / Yes); Full MITI 4.2.1 incl. global ratings (Yes / Usually "MITI-informed" / Yes); Evidence for every score (Sometimes / Rarely / Yes, linked lines); Turnaround (About 1 to 2 weeks / Instant / Minutes).
-5. **Final CTA band**, then the footer.
+5. **Team.** Last content section, then the footer (no separate final CTA band). 3 equal cards, each with photo, name, 1 to 2 line bio and a clickable LinkedIn icon. No CEO/CTO/founder-style labels. Photos live in the Drive folder https://drive.google.com/drive/folders/1PBOsn32pBQLVKSgiuAj4MrCNjgDAlNm- ; the build copies them into the repo.
+   - **Tejit Pabari.** "Engineer. 5+ years building cloud systems at Microsoft; Columbia CS (AI)." LinkedIn: https://www.linkedin.com/in/tejitpabari/ . Photo: Drive `tejit.jpg` (file ID 1sjQMHBZBA_qcW7fK38y8i8hpflFBxZSD).
+   - **Gitika Bose** (she/her). "Researcher and data scientist at Bing, working on grounding, hallucination and fact-checking. Columbia CS, cum laude." LinkedIn: https://www.linkedin.com/in/gitikabose/ . Photo: Drive `git.jpg` (file ID 1PiU3LMFQrqHqlz19iDWLR_dkSXAzWweI).
+   - **Frédérique Escudier, Ph.D., Psy.D.** with a small accent badge "Neuropsychologist". "Clinical neuropsychologist, 15+ years in cognitive assessment. Former president, Quebec Association of Neuropsychologists." LinkedIn: https://www.linkedin.com/in/escudierfrederique/ . Photo: Drive `fred.jpg` (file ID 1rOOgrmGph9B90LGa1YvPqjR3783JhkaW).
+   - Partner line under the cards: "Backed by researchers from Harvard Medical School, Columbia University Vagelos College of Physicians and Surgeons and Massachusetts General Hospital."
+   - Under that: the "Get early access" button (opens the popup) and the "Questions?" mailto link.
 
 ### `/enterprise`
 Same as `/`, with these differences:
@@ -75,7 +96,8 @@ Same as `/`, with these differences:
   - Bulk evaluations: "Volume pricing for evaluating many samples across your team or program." No numbers.
   - Quality control: "Check each coded sample against its transcript. Unsupported scores are flagged with lines, which also shows new coders where they drift."
   - Fast turnaround: "Flags arrive in minutes, so second coding focuses only on disputed scores."
-- Features and What it evaluates: the same as `/`.
+- Features: Complete and Feedback mockups are shared with `/`. The Evidence mockup is replaced by a **coder-QC mockup**: a human coder's score shown next to our flag, e.g. "Empathy 5: not supported. No complex reflections at lines 40-60; line 58 concern missed."
+- What it evaluates and the Team section (last content section, before the footer): the same as `/`.
 - Compare columns: Second human coder | Onolys evidence check. Rows: Checks every score (Yes / Yes); Points to the lines (Sometimes / Yes, linked lines); Turnaround (Days / Minutes); Scales with volume (Needs more coders / Yes).
 
 ### Sign-up flow
