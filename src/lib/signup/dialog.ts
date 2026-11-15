@@ -148,6 +148,7 @@ export function initSignupDialog(): void {
     setBusy(false);
     if (result.ok) {
       track('signup_step2');
+      document.dispatchEvent(new CustomEvent('miti:signup-complete', { detail: { email: value } }));
       entry.hidden = true;
       success.hidden = false;
       dialog.setAttribute('aria-labelledby', successHeading.id);

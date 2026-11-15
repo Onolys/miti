@@ -74,7 +74,7 @@ describe('Apps Script request handlers', () => {
 
   it('maps write failure to server and releases the lock in finally', () => {
     const harness = createAppsScriptHarness();
-    vi.spyOn(harness.sheet, 'appendRow').mockImplementation(() => { throw new Error('write failed'); });
+    vi.spyOn(harness.sheet, 'getRange').mockImplementation(() => { throw new Error('write failed'); });
     expect(post(harness)).toEqual({ ok: false, error: 'server' });
     expect(harness.events).toEqual([{ type: 'waitLock', timeout: 5000 }, 'releaseLock']);
   });

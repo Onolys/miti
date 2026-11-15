@@ -98,22 +98,27 @@ function upsert(sheet, record, now, headers) {
       if (SIGNUP_COLUMNS.indexOf(name) === -1 || record[name] == null) return '';
       return name === 'email' ? record[name] : formulaSafe(record[name]);
     });
-    sheet.appendRow(values);
+    // Plain-text format on the target row first, so appended rows are never auto-parsed.
+    sheet.getRange(sheet.getLastRow() + 1, 1, 1, headers.length)
+      .setNumberFormat('@').setValues([values]);
     return;
   }
 
-  // One read and one write for the whole row; blank values never overwrite.
-  var range = sheet.getRange(matchedRow, 1, 1, headers.length);
-  var row = range.getValues()[0];
-  row[headers.indexOf('updated')] = timestamp;
+  // One read to decide; write only the signup cells this request changes.
+  // Never write the whole row back: that would flatten owner formulas and revive
+  // stored text beginning with "=" (the quote prefix is not returned by getValues).
+  var row = sheet.getRange(matchedRow, 1, 1, headers.length).getValues()[0];
+  var writes = [['updated', timestamp]];
   SIGNUP_COLUMNS.forEach(function (name) {
-    if (name === 'first_seen' || name === 'updated' ||
+    if (name === 'first_seen' || name === 'updated' || name === 'email' || name === 'page' ||
         record[name] == null || record[name] === '') return;
-    var column = headers.indexOf(name);
-    if (name === 'src' && row[column] !== '') return;
-    row[column] = name === 'email' ? record[name] : formulaSafe(record[name]);
+    if (name === 'src' && row[headers.indexOf(name)] !== '') return;
+    writes.push([name, formulaSafe(record[name])]);
   });
-  range.setValues([row]);
+  writes.forEach(function (write) {
+    sheet.getRange(matchedRow, headers.indexOf(write[0]) + 1)
+      .setNumberFormat('@').setValue(write[1]);
+  });
 }
 
 function formulaSafe(value) {

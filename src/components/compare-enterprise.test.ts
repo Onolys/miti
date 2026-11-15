@@ -17,7 +17,7 @@ describe('enterprise comparison', () => {
     expect(rows).toEqual(expectedRows);
     expect(highlight).toBe(1);
     expect(shortColumns).toEqual(['Second coder', 'Onolys']);
-    expect(widths).toEqual([30, 30, 40]);
+    expect(widths).toEqual([26, 32, 42]);
   });
 
   it('renders exact enterprise data through the shared semantic comparison table', async () => {

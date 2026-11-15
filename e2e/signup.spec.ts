@@ -98,6 +98,9 @@ test('hero failure still opens the popup and allows the second step to save', as
   await expect(dialog(page).getByRole('heading', { name: 'Thank you for signing up.' })).toBeVisible();
   expect(backend.requests.map(({ step }) => step)).toEqual([1, 2]);
   expect((await events(page)).map((item) => item[1])).toEqual(['popup_open', 'signup_step2']);
+  // Hero stays in sync with the dialog: step 2 success replaces the failed state.
+  await expect(hero.getByRole('status')).toHaveText('You have been signed up for early access.');
+  await expect(hero.getByRole('button')).toHaveCount(0);
 });
 
 for (const trigger of ['topbar', 'team']) {

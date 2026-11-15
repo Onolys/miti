@@ -1,4 +1,5 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
+import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { describe, expect, it } from 'vitest';
 import { columns, rows, highlight, shortColumns, widths } from '../data/compare.learner';
@@ -111,5 +112,12 @@ describe('learner comparison', () => {
     expect(doc.body.textContent).not.toContain('AI practice chatbots');
     expect(doc.querySelector('colgroup')).toBeNull();
     expect(doc.querySelectorAll('[data-compare-mobile] [role="tab"]')).toHaveLength(2);
+  });
+
+  it('squares the panel corner under the active first or last tab for any option count', () => {
+    const source = readFileSync(new URL('./CompareTable.astro', import.meta.url), 'utf8');
+    expect(source).not.toMatch(/data-active='\d'\]\s+\.cpanel/);
+    expect(source).toMatch(/:has\(\.ctab:first-child\[aria-selected='true'\]\)[^{]*\.cpanel\s*\{[^}]*border-top-left-radius:\s*0/);
+    expect(source).toMatch(/:has\(\.ctab:last-child\[aria-selected='true'\]\)[^{]*\.cpanel\s*\{[^}]*border-top-right-radius:\s*0/);
   });
 });

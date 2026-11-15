@@ -155,4 +155,18 @@ describe('hero email capture', () => {
     await vi.waitFor(() => expect(form.getAttribute('aria-busy')).toBe('false'));
     expect(postSignup).toHaveBeenCalledTimes(1);
   });
+
+  it('shows the persistent success line when the dialog completes after step 1 failed', async () => {
+    postSignup.mockResolvedValue({ ok: false, error: 'network' });
+    const { form, email, error } = await initialize();
+    email.value = 'a@b.co';
+    submit(form);
+    await vi.waitFor(() => expect(error.textContent).toContain('Something went wrong'));
+    document.dispatchEvent(new CustomEvent('miti:signup-complete', { detail: { email: 'a@b.co' } }));
+    const status = document.querySelector('[role="status"]');
+    expect(status?.textContent).toBe('You have been signed up for early access.');
+    expect(error.textContent).toBe('');
+    expect(document.querySelector('[data-hero-row]')).toBeNull();
+    expect(document.querySelectorAll('.hero-signup-success')).toHaveLength(1);
+  });
 });

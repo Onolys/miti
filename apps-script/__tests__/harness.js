@@ -12,6 +12,7 @@ export function createAppsScriptHarness({
   const events = [];
   const outputs = [];
   const formats = [];
+  const writes = [];
   let existingSheet = sheetExists;
 
   const sheet = {
@@ -45,6 +46,7 @@ export function createAppsScriptHarness({
           if (values.length !== numRows || values.some((valuesRow) => valuesRow.length !== numColumns)) {
             throw new Error('Values must match the range dimensions');
           }
+          writes.push({ row, column, numRows, numColumns });
           values.forEach((valuesRow, rowOffset) => {
             const target = cells[row - 1 + rowOffset] ??= [];
             valuesRow.forEach((value, columnOffset) => {
@@ -135,7 +137,7 @@ export function createAppsScriptHarness({
   const context = vm.createContext({ SpreadsheetApp, PropertiesService, LockService, ContentService });
   vm.runInContext(readFileSync(codePath, 'utf8'), context, { filename: 'Code.gs' });
 
-  return { context, sheet, spreadsheet, lock, scriptProperties, SpreadsheetApp, PropertiesService, LockService, ContentService, events, outputs, formats };
+  return { context, sheet, spreadsheet, lock, scriptProperties, SpreadsheetApp, PropertiesService, LockService, ContentService, events, outputs, formats, writes };
 }
 
 function isPopulated(value) {

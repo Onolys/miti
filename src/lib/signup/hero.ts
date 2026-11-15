@@ -19,6 +19,43 @@ export function initHeroForms(root: ParentNode = document): void {
     let busy = false;
     let completed = false;
 
+    function showDone(): void {
+      if (completed) return;
+      completed = true;
+      error.textContent = '';
+      const done = document.createElement('p');
+      done.className = 'hero-signup-success';
+      done.setAttribute('role', 'status');
+      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      icon.setAttribute('viewBox', '0 0 20 20');
+      icon.setAttribute('width', '20');
+      icon.setAttribute('height', '20');
+      icon.setAttribute('aria-hidden', 'true');
+      icon.setAttribute('focusable', 'false');
+      const mark = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      mark.setAttribute('d', 'M4 10.5l4 4 8-9');
+      mark.setAttribute('fill', 'none');
+      mark.setAttribute('stroke', 'currentColor');
+      mark.setAttribute('stroke-width', '2.4');
+      mark.setAttribute('stroke-linecap', 'round');
+      mark.setAttribute('stroke-linejoin', 'round');
+      icon.append(mark);
+      const text = document.createElement('span');
+      text.textContent = 'You have been signed up for early access.';
+      done.append(icon, text);
+      row.replaceWith(done);
+    }
+
+    // The dialog's step 2 can succeed even when step 1 failed; keep the hero in sync.
+    const onComplete = (): void => {
+      if (!form.isConnected) {
+        document.removeEventListener('miti:signup-complete', onComplete);
+        return;
+      }
+      showDone();
+    };
+    document.addEventListener('miti:signup-complete', onComplete);
+
     email.addEventListener('focus', () => warmUp(), { once: true });
 
     email.addEventListener('input', () => {
@@ -53,29 +90,8 @@ export function initHeroForms(root: ParentNode = document): void {
       busy = false;
       form.setAttribute('aria-busy', 'false');
       if (result.ok) {
-        completed = true;
         track('signup_step1');
-        const done = document.createElement('p');
-        done.className = 'hero-signup-success';
-        done.setAttribute('role', 'status');
-        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        icon.setAttribute('viewBox', '0 0 20 20');
-        icon.setAttribute('width', '20');
-        icon.setAttribute('height', '20');
-        icon.setAttribute('aria-hidden', 'true');
-        icon.setAttribute('focusable', 'false');
-        const mark = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        mark.setAttribute('d', 'M4 10.5l4 4 8-9');
-        mark.setAttribute('fill', 'none');
-        mark.setAttribute('stroke', 'currentColor');
-        mark.setAttribute('stroke-width', '2.4');
-        mark.setAttribute('stroke-linecap', 'round');
-        mark.setAttribute('stroke-linejoin', 'round');
-        icon.append(mark);
-        const text = document.createElement('span');
-        text.textContent = 'You have been signed up for early access.';
-        done.append(icon, text);
-        row.replaceWith(done);
+        showDone();
       } else {
         setSubmitting(button, false);
         error.textContent = 'Something went wrong. Try again, or email tejitpabari99@gmail.com.';

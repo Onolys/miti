@@ -4,7 +4,7 @@ export const columns = ['Second human coder', 'Onolys evidence check'] as const;
 /** Short labels for the mobile option tabs. */
 export const shortColumns = ['Second coder', 'Onolys'] as const;
 /** Desktop column widths in percent: criterion narrowest, Onolys widest. */
-export const widths = [30, 30, 40] as const;
+export const widths = [26, 32, 42] as const;
 
 export const rows = [
   { criterion: 'Checks every score', values: ['Yes', 'Yes'] },

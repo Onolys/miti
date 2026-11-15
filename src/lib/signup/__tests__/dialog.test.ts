@@ -328,4 +328,17 @@ describe('signup dialog', () => {
     finishStep1({ ok: true, confirmed: true });
     await vi.waitFor(() => expect(postSignup).toHaveBeenCalledExactlyOnceWith(2, expect.objectContaining({ email: 'Person@example.com' })));
   });
+
+  it('dispatches miti:signup-complete with the email when step 2 succeeds', async () => {
+    postSignup.mockResolvedValue({ ok: true });
+    const { form, email, success } = await initialize();
+    const completed = vi.fn();
+    document.addEventListener('miti:signup-complete', completed);
+    email.value = 'a@b.co';
+    submit(form);
+    await vi.waitFor(() => expect(success.hidden).toBe(false));
+    expect(completed).toHaveBeenCalledTimes(1);
+    expect((completed.mock.calls[0][0] as CustomEvent).detail).toEqual({ email: 'a@b.co' });
+    document.removeEventListener('miti:signup-complete', completed);
+  });
 });
