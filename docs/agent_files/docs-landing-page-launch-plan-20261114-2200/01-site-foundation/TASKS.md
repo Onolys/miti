@@ -15,9 +15,9 @@ Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-
 | 4 | Team section and photos | 3 | done |
 | 5 | Firebase hosting config and redirect site | 1 | done |
 | 6 | Env guard, build:prod, deploy script | 1 | done |
-| 7 | Playwright config and smoke e2e | 3, 4 | in-progress |
-| 8 | CI workflow: tests on push and PR | 6, 7 | todo |
-| 9 | CI deploy job on push to main | 5, 6, 8 | todo |
+| 7 | Playwright config and smoke e2e | 3, 4 | done |
+| 8 | CI workflow: tests on push and PR | 6, 7 | done |
+| 9 | CI deploy job on push to main | 5, 6, 8 | done |
 
 ## Task 1 — Project scaffold, tokens, Vitest
 What it is / what it means: The empty repo becomes a buildable static Astro project (R1, R2; decisions 1-3).

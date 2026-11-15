@@ -8,6 +8,10 @@ date: 2026-11-15
 
 **TL;DR.** Two static Astro pages (`/` learners, `/enterprise` orgs) on Firebase Hosting at `miti.onolys.com`. Sign-ups go through a Google Apps Script web app into a Google Sheet; no server. Purpose is customer discovery only. [brainstorm.md](brainstorm.md) is the approved brief and the source of truth. Implementation continues on the existing branch `docs/landing-page-launch-plan` in `/root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan`; do not create a new branch or worktree.
 
+## Current progress
+
+SP01 Tasks 1–9 implemented; CI passed; independent review pending. SP02 implementation review passed, with Task 6 blocked on owner deployment verification. SP03 Tasks 1–2 done, Task 3 in-progress; SP04–05 todo. Production deployment and live acceptance remain outstanding. See each TASKS.md for the resume state.
+
 ## Sub-projects
 
 | # | Folder | Scope (one line) | Depends on | Phase |

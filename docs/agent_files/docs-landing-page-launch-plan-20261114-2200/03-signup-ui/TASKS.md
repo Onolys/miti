@@ -9,9 +9,9 @@ Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Field config and body builder + unit tests | SP01 T2 | todo |
-| 2 | Network client, Plan A/B switch + unit tests | 1, SP01 T1 | todo |
-| 3 | HeroForm, honeypot, temporary shell placement | 2, SP01 T3 | todo |
+| 1 | Field config and body builder + unit tests | SP01 T2 | done |
+| 2 | Network client, Plan A/B switch + unit tests | 1, SP01 T1 | done |
+| 3 | HeroForm, honeypot, temporary shell placement | 2, SP01 T3 | in-progress |
 | 4 | SignupDialog and Base mount | 1, 2, 3, SP01 T3 | todo |
 | 5 | Playwright flows (desktop + Pixel 5) | 3, 4, SP01 T7 | todo |
 | 6 | Accessibility, storage and dev-mode checks | 5 | todo |
