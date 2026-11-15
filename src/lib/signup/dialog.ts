@@ -90,6 +90,8 @@ export function initSignupDialog(): void {
   document.addEventListener('miti:open-popup', (event) => {
     if (!dialog.isConnected) return;
     const detail = (event as CustomEvent<{ trigger?: string; email?: string }>).detail;
+    // A delayed hero request must preserve a popup the visitor has already opened.
+    if (detail?.trigger === 'hero' && sessionOpen) return;
     if (!sessionOpen) {
       invoker = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       previousOverflow = document.body.style.overflow;

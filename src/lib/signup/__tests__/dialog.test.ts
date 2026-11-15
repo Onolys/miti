@@ -96,6 +96,51 @@ describe('signup dialog', () => {
     expect(track).toHaveBeenCalledExactlyOnceWith('popup_open', { trigger: 'hero' });
   });
 
+  it.each(['editing', 'saving', 'success'] as const)('preserves the active CTA session when a late hero response arrives while %s', async (stage) => {
+    let finish!: (result: SignupResult) => void;
+    postSignup.mockReturnValue(new Promise<SignupResult>((resolve) => { finish = resolve; }));
+    const { dialog, invoker, form, email, role, answer, button, entry, success } = await initialize();
+    email.value = 'popup@example.com';
+    role.value = 'Researcher';
+    answer.value = 'Keep my answers';
+    answer.focus();
+    if (stage !== 'editing') submit(form);
+    if (stage === 'success') {
+      finish({ ok: true, confirmed: true });
+      await vi.waitFor(() => expect(success.hidden).toBe(false));
+    }
+    const focused = document.activeElement;
+
+    open('hero@example.com', 'hero');
+
+    expect(email.value).toBe('popup@example.com');
+    expect(role.value).toBe('Researcher');
+    expect(answer.value).toBe('Keep my answers');
+    expect(document.activeElement).toBe(focused);
+    expect(dialog.showModal).toHaveBeenCalledTimes(1);
+    expect(track.mock.calls.filter(([event]) => event === 'popup_open')).toEqual([
+      ['popup_open', { trigger: 'topbar' }],
+    ]);
+    expect(button.disabled).toBe(stage === 'saving');
+    expect(form.getAttribute('aria-busy')).toBe(String(stage === 'saving'));
+    expect(success.hidden).toBe(stage !== 'success');
+    expect(entry.hidden).toBe(stage === 'success');
+    if (stage !== 'success') {
+      // The delayed event must neither allow a duplicate save nor invalidate the pending response.
+      submit(form);
+      expect(postSignup).toHaveBeenCalledExactlyOnceWith(2, {
+        email: 'popup@example.com', honeypot: '', fields: { role: 'Researcher', anything_else: 'Keep my answers' },
+      });
+      finish({ ok: true, confirmed: true });
+      await vi.waitFor(() => expect(success.hidden).toBe(false));
+    }
+    expect(dialog.getAttribute('aria-labelledby')).toBe('signup-success-title');
+    expect(document.activeElement).toBe(success.querySelector('h2'));
+    expect(track.mock.calls).toEqual([['popup_open', { trigger: 'topbar' }], ['signup_step2']]);
+    dialog.close();
+    expect(document.activeElement).toBe(invoker);
+  });
+
   it.each(['', 'bad-email', '=a@b.co'])('blocks invalid email %j locally', async (value) => {
     const { form, email, emailError } = await initialize(value);
     submit(form);

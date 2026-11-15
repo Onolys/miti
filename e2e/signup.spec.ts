@@ -183,6 +183,43 @@ test('each form sends one request while busy, including repeated Enter', async (
   expect(backend.requests).toHaveLength(2);
 });
 
+test('late hero response preserves answers and a pending save in a CTA dialog', async ({ page, backend }) => {
+  const heroPending = deferredReply();
+  const popupPending = deferredReply();
+  backend.respond = (body) => body.step === 1 ? heroPending.promise : popupPending.promise;
+  await visit(page);
+  const hero = page.locator('[data-hero-signup]');
+  await hero.getByRole('textbox', { name: 'Email' }).fill('hero@example.com');
+  await hero.getByRole('button').click();
+  await expect.poll(() => backend.requests.length).toBe(1);
+  await topbar(page).click();
+  await email(page).fill('popup@example.com');
+  await dialog(page).getByLabel('Role', { exact: true }).selectOption('Researcher');
+  const answer = dialog(page).getByLabel('Anything else');
+  await answer.fill('Keep my answers');
+  await submit(page).click();
+  await expect.poll(() => backend.requests.length).toBe(2);
+  await answer.focus();
+
+  heroPending.resolve({ ok: true });
+
+  await expect(hero.getByRole('status')).toBeAttached();
+  await expect(email(page)).toHaveValue('popup@example.com');
+  await expect(dialog(page).getByLabel('Role', { exact: true })).toHaveValue('Researcher');
+  await expect(answer).toHaveValue('Keep my answers');
+  await expect(answer).toBeFocused();
+  await expect(dialog(page).getByRole('button', { name: 'Sending…' })).toBeDisabled();
+  await expect(dialog(page).locator('form')).toHaveAttribute('aria-busy', 'true');
+  await email(page).press('Enter');
+  expect(backend.requests).toHaveLength(2);
+  popupPending.resolve({ ok: true });
+  await expect(dialog(page).getByRole('heading', { name: 'Thank you for signing up.' })).toBeFocused();
+  expect(backend.requests[1]).toMatchObject({ step: 2, email: 'popup@example.com', role: 'Researcher', anything_else: 'Keep my answers' });
+  expect((await events(page)).map((item) => item[1])).toEqual(['popup_open', 'signup_step1', 'signup_step2']);
+  await dialog(page).getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(topbar(page)).toBeFocused();
+});
+
 test('enterprise renders its fields, submits page context and keeps honeypots inert', async ({ page, backend }) => {
   await visit(page, '/enterprise');
   for (const honeypot of await page.locator('[name="company_website"]').all()) {
