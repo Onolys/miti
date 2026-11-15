@@ -17,3 +17,11 @@ it('keeps an unconfigured development build usable', async () => {
   const { SIGNUP_URL } = await import('./config');
   expect(SIGNUP_URL).toBe('');
 });
+
+it.each([
+  [undefined, 'A'], ['A', 'A'], ['B', 'B'], ['b', 'A'], ['invalid', 'A'],
+])('selects signup plan %s as %s', async (configured, expected) => {
+  vi.stubEnv('PUBLIC_SIGNUP_PLAN', configured);
+  const { SIGNUP_PLAN } = await import('./config');
+  expect(SIGNUP_PLAN).toBe(expected);
+});
