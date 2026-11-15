@@ -9,7 +9,7 @@ Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | MITI formulas and reference levels (`miti.ts`) | SP01 T1 | todo |
+| 1 | MITI formulas and reference levels (`miti.ts`) | SP01 T1 | in-progress |
 | 2 | Role-play dataset (`roleplay.ts`) and its locking test | 1 | todo |
 | 3 | Highlight behavior, TranscriptPane, EvidenceMockup | 2, SP01 T3 | todo |
 | 4 | CompleteMockup and FeedbackMockup | 2, SP01 T1 | todo |

@@ -10,7 +10,7 @@ date: 2026-11-15
 
 ## Current progress
 
-SP01 Tasks 1–9 implemented; CI passed; independent review pending. SP02 implementation review passed, with Task 6 blocked on owner deployment verification. SP03 Tasks 1–2 done, Task 3 in-progress; SP04–05 todo. Production deployment and live acceptance remain outstanding. See each TASKS.md for the resume state.
+SP01 Tasks 1–9 implemented; CI and three-persona review passed. SP02 implementation review passed, with Task 6 blocked on owner deployment verification. SP03 Tasks 1–3 done, Task 4 in-progress; independent SP04 Task 1 in-progress; SP05 todo. Production deployment and live acceptance remain outstanding. See each TASKS.md for the resume state.
 
 ## Sub-projects
 
