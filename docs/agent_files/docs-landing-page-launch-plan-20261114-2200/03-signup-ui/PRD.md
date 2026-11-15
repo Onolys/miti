@@ -1,11 +1,11 @@
 ---
-status: draft
+status: approved
 summary: Hero email form and native-dialog early-access popup for both pages, with a tested Apps Script network client, GA events and Playwright e2e
 date: 2026-11-15
 ---
 # PRD: SP03 Sign-up UI
 
-Repo/branch: `miti`, `feat/landing-page` · Depends on: SP01 (CTA/event/helpers/test setup), SP02 (request/response contract) · Owns: `src/components/{HeroForm,SignupDialog}.astro`, `src/lib/signup/{client,body,dialog,hero}.ts`, `src/data/signup-fields.ts`, `src/styles/signup.css`, `src/lib/signup/__tests__/*`, `e2e/signup.spec.ts`. Small edits to SP01 files: mount `<SignupDialog/>` in `Base.astro`; add `PUBLIC_SIGNUP_PLAN` to `.env.example`; `src/lib/config.ts` (see [OPEN] 1).
+Repo/branch: `miti`, `feat/landing-page` · Depends on: SP01 (CTA/event/helpers/test setup), SP02 (request/response contract) · Owns: `src/components/{HeroForm,SignupDialog}.astro`, `src/lib/signup/{client,body,dialog,hero}.ts`, `src/data/signup-fields.ts`, `src/styles/signup.css`, `src/lib/signup/__tests__/*`, `e2e/signup.spec.ts`. Small edits to SP01 files: mount `<SignupDialog/>` in `Base.astro`; add `PUBLIC_SIGNUP_PLAN` to `.env.example`; `src/lib/config.ts` (see open item 1).
 
 ## TL;DR
 Vanilla TS, no framework. `HeroForm` (embedded by SP04/05) posts step 1, shows thanks, then fires `miti:open-popup` with the email. One `SignupDialog` per page (native `<dialog>`) listens for that event, renders the per-page field set from a config file, posts step 2, and swaps to "Thank you for signing up." A small `client.ts` owns the POST (text/plain, timeout, one `busy` retry, Plan A/B switch). GA via SP01's `track()`.
@@ -28,7 +28,7 @@ The hero email must survive an abandoned or failed popup. Two forms hit one idem
 - `<form novalidate>`; visually-hidden `<label>` "Email"; `type=email autocomplete=email inputmode=email`; invalid state sets `aria-invalid`, message in `aria-describedby` region. Client check uses SP02's regex `^[A-Za-z0-9][^\s@]*@[^\s@]+\.[^\s@]{2,}$` after trim, max 254, so client and server never disagree.
 - Submit: guard against in-flight (button disabled + `aria-busy`, Enter-repeat ignored) → `postSignup(1, {email})`.
   - Success: `track('signup_step1')`; replace the form row with `role=status` text "Thanks. We'll reach out with early access information in a few weeks."; dispatch `miti:open-popup` `{trigger:'hero', email}`.
-  - Failure: no thanks text, form stays usable, still dispatch the same event (brief rule). No inline error (popup carries the save). See [OPEN] 3.
+  - Failure: no thanks text, form stays usable, still dispatch the same event (brief rule). No inline error (popup carries the save). See open item 3.
 - Includes the honeypot (R4).
 
 **R2 Popup** (`<SignupDialog />`, mounted once in Base)
@@ -47,7 +47,7 @@ The hero email must survive an abandoned or failed popup. Two forms hit one idem
 |---|---|
 | learner | `role`, `how_often`, `feedback_today`, `pay` ("What would you pay per evaluation"), `anything_else` |
 | enterprise | `role` (enterprise list), `organization`, `org_type`, `team_size` ("Number of coders or learners"), `samples_per_month`, `feedback_today`, `pay` ("per checked sample"), `anything_else` |
-Option strings copied exactly from the brief. Enterprise has no `how_often`. [OPEN] 4 on enterprise field order.
+Option strings copied exactly from the brief. Enterprise has no `how_often`. open item 4 on enterprise field order.
 
 **R4 Honeypot**: wrapper div with `aria-hidden="true"` and `inert`, positioned off-screen (not `display:none`, which simple bots skip), input `type=text name=company_website tabindex=-1 autocomplete=off`, no visible label. Sent as body key `honeypot` (SP02 name). Present on both forms. Browser autofill extensions may fill it: accepted risk, honeypot hit still returns ok:true so humans see success.
 
@@ -72,7 +72,7 @@ HeroForm ── postSignup(1) ─▶ thanks ─▶ same event {trigger:'hero', e
 SignupDialog (listens) ── track(popup_open) ── form from signup-fields[page] ── postSignup(2)
 client.ts ─ fetch text/plain ─▶ Apps Script (Plan A readable | Plan B no-cors)
 ```
-Upsert key is email+page, lowercased by the server. Sequence for a hero visitor: row from step 1 (email only), step 2 fills the same row. If the popup email differs from the hero email, step 2 creates a second row; the hero-only row stays (anti-goal "lose a hero email" is satisfied; see [OPEN] 2). Hero-fail then popup-success also works: SP02 creates the row on step 2.
+Upsert key is email+page, lowercased by the server. Sequence for a hero visitor: row from step 1 (email only), step 2 fills the same row. If the popup email differs from the hero email, step 2 creates a second row; the hero-only row stays (anti-goal "lose a hero email" is satisfied; see open item 2). Hero-fail then popup-success also works: SP02 creates the row on step 2.
 
 ## Decisions
 | # | Decision | Choice | Alternatives considered | Why |
@@ -94,7 +94,7 @@ Upsert key is email+page, lowercased by the server. Sequence for a hero visitor:
 
 ## Risks / Open Questions
 1. [RESOLVED: SP01 owns and ships src/lib/config.ts and the <SignupDialog/> mount point in Base.astro plus PUBLIC_SIGNUP_PLAN in .env.example; SP03 adds SIGNUP_PLAN export] SP01 R3/Architecture says SP01 creates `src/lib/config.ts` (exports `PUBLIC_SIGNUP_URL`) but it is missing from SP01's "Owns" list. SP03 adds `SIGNUP_PLAN` there; confirm SP01 ships the file first. Also `Base.astro` (SP01) must mount `<SignupDialog/>`, and `.env.example` gets `PUBLIC_SIGNUP_PLAN` (check-env ignores it).
-2. [OPEN] Popup email differing from hero email yields two rows (hero-only row orphaned). Accept for discovery, or ask SP02 for `prev_email` merge.
+2. [RESOLVED: accept two rows; no merge] Popup email differing from hero email yields two rows (hero-only row orphaned). Accept for discovery, or ask SP02 for `prev_email` merge.
 3. [RESOLVED: none; popup opens and its save carries the row] Brief defines no hero-failure inline copy. Default: none (popup opens, its save retries).
 4. [RESOLVED: defaults in R2/R3] Enterprise field order and popup heading/intro copy are unspecified in the brief; defaults in R2/R3.
 5. [RESOLVED: accepted; SP04/05 move it into their hero] SP04/05 not built when SP03 tests run: SP03 temporarily places `<HeroForm/>` in each shell under the SP04/05 slot comment; they move it into their Hero section. Confirm that overlap is OK.

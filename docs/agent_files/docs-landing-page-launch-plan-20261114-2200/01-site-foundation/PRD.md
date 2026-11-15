@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Astro skeleton for both pages: layout, tokens, CTA/popup-open contract, src/page/track helpers, Team section, Firebase hosting + domain redirect, test and CI scaffolding
 date: 2026-11-15
 ---
@@ -21,7 +21,7 @@ Four other sub-projects build into the same site. Without a fixed skeleton and a
 |---|---|
 | Both routes build and deploy-ready, with top bar, footer, Team section | Page copy, mockups, compare tables (SP04/05) |
 | Stable popup / src / page / track contracts | The dialog, forms, POST logic (SP03); Apps Script (SP02) |
-| Hosting, redirect, headers, caching in config | Actually deploying or DNS (final ship; owner steps) |
+| Hosting, redirect, headers, caching in config | DNS (owner step); first live deploy runs via CI deploy job |
 | Test runners and CI wired and green on an empty-ish site | Writing sign-up e2e tests (SP03) |
 | No server code, no cookies, no localStorage | Prices, FAQ, policy pages, link from `/` to `/enterprise` |
 
@@ -64,7 +64,8 @@ Four other sub-projects build into the same site. Without a fixed skeleton and a
 **R8 Tests and CI**
 - Vitest (node env, jsdom for DOM helpers); `include` covers `src/**` and `apps-script/**` so SP02's logic tests run in the same runner. Unit tests here: `getSrc` sanitization, `getPage`, `track` merge + no-throw without GA, `check-env`.
 - Playwright config: `testDir: e2e`, Chromium only, desktop + mobile (Pixel 5) projects, `webServer: npm run build && npm run preview` on 4321, `launchOptions.executablePath` from `PW_CHROMIUM_PATH` if set (local preinstalled Chromium; no `playwright install` locally). One smoke e2e: both routes load, top bar CTA exists and dispatches `miti:open-popup`, `/enterprise` has noindex, Team shows 3 cards.
-- CI (`ci.yml`, on push and PR): checkout, setup-node (LTS, npm cache), `npm ci`, `astro check`, `vitest run`, `npm run build` with `PUBLIC_SIGNUP_URL=https://script.google.com/macros/s/TEST/exec` and `PUBLIC_GA_ID=G-TEST000000` set as plain workflow `env` (neither is a secret; real values live in repo Variables for later deploy use), `npx playwright install --with-deps chromium`, `playwright test`. e2e aborts requests to googletagmanager.com. Upload Playwright report on failure. No deploy job in v1.
+- CI (`ci.yml`, on push and PR): checkout, setup-node (LTS, npm cache), `npm ci`, `astro check`, `vitest run`, `npm run build` with `PUBLIC_SIGNUP_URL=https://script.google.com/macros/s/TEST/exec` and `PUBLIC_GA_ID=G-TEST000000` set as plain workflow `env` (neither is a secret; real values live in repo Variables for later deploy use), `npx playwright install --with-deps chromium`, `playwright test`. e2e aborts requests to googletagmanager.com. Upload Playwright report on failure.
+- CI deploy job (`ci.yml`): runs on push to `main` only and `needs` the test job (tests green). Builds with real `PUBLIC_SIGNUP_URL`, `PUBLIC_GA_ID`, `PUBLIC_SIGNUP_PLAN` from GitHub repo variables/secrets (via `build:prod`, so check-env guards it), then deploys both Hosting sites (`miti`, `redirect`) using the official Firebase deploy action or firebase-tools with the service-account secret (e.g. `FIREBASE_SERVICE_ACCOUNT`).
 
 ## Architecture
 ```
@@ -102,24 +103,26 @@ track(event: string, params?: Record<string, unknown>): void // adds page+src
 | 9 | Photos | Commit optimized files in repo via `astro:assets` | Fetch from Drive at build | Build must not depend on Drive auth; hashed, long-cached |
 | 10 | Prod env guard | `build:prod` fails on missing/malformed PUBLIC_* | Silent empty defaults | Silent no-op would lose all sign-ups |
 | 11 | e2e target | Production build via `astro preview` | `astro dev` | Tests what ships, including env inlining |
-| 12 | CI env | Dummy PUBLIC_* inline in workflow | GitHub Secrets | Values are public by design; fake values keep e2e hermetic |
+| 12 | CI env | Dummy PUBLIC_* inline in workflow for tests; real values from repo variables in the deploy job | GitHub Secrets for all | Values are public by design; fake values keep e2e hermetic |
+| 13 | Deploy | GitHub Actions deploy job on push to main after green tests, service-account secret | Owner-run `npm run deploy` only | Owner decision: automatic, repeatable; `npm run deploy` stays as manual fallback |
 
 ## Manual steps (owner-only)
-- Create Firebase project; add two Hosting sites (`miti`, `redirect`); enable GA4 and send the measurement ID; grant deploy access or run `npm run deploy`.
+- Create Firebase project; add two Hosting sites (`miti`, `redirect`); enable GA4 and send the measurement ID; create the Firebase project if the implementer lacks CLI auth.
 - Connect custom domains in Hosting: `miti.onolys.com` to site `miti`; `onolys.com` and `www.onolys.com` to site `redirect`. Add the A/TXT records Firebase shows at Namecheap.
+- Add the Firebase service-account secret (`FIREBASE_SERVICE_ACCOUNT`) and the `PUBLIC_SIGNUP_URL` / `PUBLIC_GA_ID` / `PUBLIC_SIGNUP_PLAN` repo variables in GitHub (implementer may create the service account if CLI auth exists).
 - Supply the real `PUBLIC_SIGNUP_URL` (from SP02's Apps Script deploy) and `PUBLIC_GA_ID`.
 - If Drive access is unavailable to the agent: place the 3 team photos in `src/assets/team/`.
 
 ## Risks / Open Questions
-- [OPEN] Agent access to the Drive folder (MCP download by file ID) is unverified; folder may be private. Fallback: owner supplies files; build uses initials placeholders meanwhile.
-- [OPEN] Does `onolys.com` currently host a site or have A/CNAME records (and `www`) that must be replaced? MX/email records must not be touched. Owner to confirm before pointing DNS.
-- [OPEN] Firebase project ID and the two site IDs (placeholders in `.firebaserc` until owner creates them).
-- [OPEN] Deploy method: owner-run `firebase deploy` vs a GitHub Actions deploy with a service-account secret. Default: owner/agent runs `npm run deploy`; no CI deploy in v1.
+- [RESOLVED: implementer downloads tejit.jpg, git.jpg, fred.jpg from the Drive folder via the Google Drive connector (file IDs in brief); if access fails, ask owner for files; initials placeholders meanwhile] Agent access to the Drive folder (MCP download by file ID) is unverified; folder may be private.
+- [RESOLVED: nothing to keep on onolys.com or www; point both at the redirect site; never touch MX records] Does `onolys.com` currently host a site or have A/CNAME records (and `www`) that must be replaced? MX/email records must not be touched.
+- [RESOLVED: create a new Firebase project named "Onolys" (project ID `onolys`, or `onolys-<suffix>` if taken) at implementation if Firebase/gcloud CLI auth is available on the machine; otherwise owner creates it and sends the ID] Firebase project ID and the two site IDs (placeholders in `.firebaserc` until the project exists).
+- [RESOLVED: auto deploy from GitHub Actions on push to main (after tests pass), using a Firebase service-account secret] Deploy method: owner-run `firebase deploy` vs a GitHub Actions deploy with a service-account secret.
 - [DEFERRED: verify at implementation] Path of the preinstalled Chromium on this machine for `PW_CHROMIUM_PATH` (Playwright may find it by default; verify at scaffold).
 - [DEFERRED: verify at implementation] Final teal hex and contrast check against buttons and chip backgrounds.
 - [RESOLVED: second Hosting site with `redirects` rule; Namecheap URL redirect rejected] Host-based redirect.
 - [RESOLVED: gtag stub + `dataLayer`] Behavior of `track()` when GA ID unset.
-- [DEFERRED] CSP header, consent banner (revisit if GA4 shows real EU share, per brief), CI deploy.
+- [DEFERRED] CSP header, consent banner (revisit if GA4 shows real EU share, per brief).
 - Risk: `cleanUrls` + Astro directory output can cause trailing-slash redirect loops; smoke-test `/enterprise` on the Firebase emulator or preview channel before go-live.
 
 ## Acceptance Criteria
@@ -130,4 +133,5 @@ track(event: string, params?: Record<string, unknown>): void // adds page+src
 - `build:prod` exits non-zero with either PUBLIC_* missing or malformed.
 - `firebase.json` validates (`firebase emulators:start --only hosting` or `firebase hosting:channel:deploy` dry run): two sites, clean URLs, immutable caching on `/_astro/**`, HTML no-cache, redirect site 301s any path to `https://miti.onolys.com`.
 - `vitest run` and `playwright test` (desktop + mobile smoke) pass locally and in GitHub Actions on push/PR.
+- A push to `main` with green tests triggers the deploy job, which builds with real PUBLIC_* values and deploys both Hosting sites; a push with failing tests, or a PR, does not deploy.
 - No localStorage/sessionStorage/cookie writes by site code; layout has no horizontal scroll at 360px.

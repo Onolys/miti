@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Learner page `/` content (Hero, Features tabs, What it evaluates, Compare) plus reusable Evidence/Complete/Feedback mockups driven by one role-play dataset whose MITI 4.2.1 summary scores are computed and unit-tested
 date: 2026-11-15
 ---
@@ -117,8 +117,8 @@ All client JS is vanilla TS (`tabs.ts`, `highlight.ts`), bundled by Astro, a few
 - Have one MI trainer/coder read the role-play and its coding for plausibility before launch (brief risk "mockups look fake"). Implementer may not self-certify.
 
 ## Risks / Open Questions
-- [OPEN] **Brief conflict:** the enterprise QC example says "No complex reflections at lines 40-60" but the brief also puts CRs at 44 and 52. Data keeps the brief's CR lines; proposed SP05 wording is "lines 53-66" (a test asserts no CR there). Needs owner OK.
-- [OPEN] Card 6 has no second line in the brief. Proposed: "Feedback while the session is still fresh." Confirm.
+- [RESOLVED: use lines 53-66] **Brief conflict:** the enterprise QC example says "No complex reflections at lines 40-60" but the brief also puts CRs at 44 and 52. Data keeps the brief's CR lines; proposed SP05 wording is "lines 53-66" (a test asserts no CR there). Needs owner OK.
+- [RESOLVED: "Feedback while the session is still fresh."] Card 6 has no second line in the brief. Proposed: "Feedback while the session is still fresh." Confirm.
 - [RESOLVED: horizontal tab row] Mobile Features interpretation (tab row vs accordion), default tab row; low impact.
 - [RESOLVED: HeroForm per 03-signup-ui PRD] SP03 `HeroForm` path and props.
 - [DEFERRED: verify at implementation] Reference levels (3/4, 3.5/4, 40/50, 1:1/2:1) are the brief's; verify against the MITI 4.2.1 manual when writing the legend.

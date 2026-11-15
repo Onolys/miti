@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Index of the miti landing page design - 5 sub-project PRDs, contracts, locked decisions, open owner questions
 date: 2026-11-15
 ---
@@ -46,29 +46,27 @@ date: 2026-11-15
 - GA4 via the Firebase project, no cookie banner.
 - US spelling; no accuracy numbers, no "official MITI" implication.
 - All mockups come from one fake role-play (single source in `roleplay.ts`).
-- Tests: Vitest unit + Playwright e2e (desktop + Pixel 5), CI on push/PR.
+- Tests: Vitest unit + Playwright e2e (desktop + Pixel 5), CI on push/PR; GitHub Actions auto-deploys to Firebase on push to main after tests pass.
 - Done = deployed and live, not just merged.
 
-## Consolidated open questions (owner decisions)
+## Resolved owner decisions
 
-| PRD | Question | Default |
-|---|---|---|
-| 01 | Agent access to the Drive folder (team photos) | Owner supplies files; initials placeholders meanwhile |
-| 01 | Does `onolys.com`/`www` currently host a site or DNS records to replace (MX untouched) | Owner confirms before DNS change |
-| 01 | Firebase project ID and the two site IDs | Placeholders in `.firebaserc` |
-| 01 | Deploy method | Owner/agent runs `npm run deploy`; no CI deploy in v1 |
-| 02 | Which Google account hosts the script | Personal account if Workspace blocks "Anyone" |
-| 03 | Popup email differs from hero email gives two rows | Accept for discovery |
-| 04 | Brief conflict: QC example "lines 40-60" vs CRs at 44 and 52 | Keep CR lines; SP05 wording "53-66" |
-| 04 | Card 6 second line (none in brief) | "Feedback while the session is still fresh." |
-| 05 | Approve coder-QC example wording "Empathy 5: not supported. No complex reflections at lines 53-66; line 58 concern missed." | 53-66 |
-| 05 | Confirm the coder's invented scores (CCT 3, SST 4, Partnership 4, Empathy 5, CR 7, extra CR at 59) | Keep; MI trainer reviews |
+- 01 Drive photos: implementer downloads tejit.jpg, git.jpg, fred.jpg via Google Drive connector (file IDs in brief); if access fails, ask owner; initials placeholders meanwhile.
+- 01 onolys.com/www: nothing to keep; point both at redirect site; never touch MX.
+- 01 Firebase project: create new project "Onolys" (ID `onolys`, or `onolys-<suffix>`) at implementation if CLI auth exists; else owner creates and sends ID.
+- 01 Deploy: auto deploy from GitHub Actions on push to main after tests pass, Firebase service-account secret.
+- 02 Google account: personal Gmail (tejitpabari99@gmail.com) owns Sheet and script.
+- 03 Popup email differs from hero email: accept two rows; no merge.
+- 04 Brief conflict 40-60 vs 53-66: use lines 53-66.
+- 04 Card 6 copy: "Feedback while the session is still fresh."
+- 05 QC wording approved exactly: "Empathy 5: not supported. No complex reflections at lines 53-66; line 58 concern missed."
+- 05 Coder scores approved: CCT 3, SST 4, Partnership 4, Empathy 5, CR 7, extra CR at line 59.
 
 Deferred to implementation (verify then): Chromium path, teal hex contrast, Plan A readability probe, Apps Script quotas, apostrophe visibility, Plan A vs B, dialog Esc in Pixel 5, MITI 4.2.1 reference levels.
 
 ## Owner-only manual steps
 
 - Create the Google Sheet, paste the script, deploy as web app (Execute as: Me, Access: Anyone), send the URL.
-- Create the Firebase project, enable GA4, send the measurement ID; give deploy access or run the deploy.
+- Create the Firebase project, enable GA4, send the measurement ID (implementer may create the project if CLI auth exists); add the Firebase service-account secret and PUBLIC_* repo variables in GitHub.
 - Add the Firebase DNS records for both domains at Namecheap.
-- Have one MI trainer/coder review the mockups (esp. the QC mockup) and approve the open wording items above.
+- Have one MI trainer/coder review the mockups (esp. the QC mockup) (wording items already approved).

@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: /enterprise page (noindex, unlinked): QC hero, Benefits, coder-QC mockup in the Evidence tab built from the shared role-play, enterprise compare table; reuses SP04 pieces
 date: 2026-11-15
 ---
@@ -9,7 +9,7 @@ Repo/branch: `miti`, `feat/landing-page` · Depends on: SP01 (shell, Base `noind
 **Owns:** `src/pages/enterprise.astro` (SP05 slot only), `src/components/{BenefitsSection}.astro`, `src/components/mockups/QcMockup.astro`, `src/data/{benefits,roleplay.qc,compare.enterprise}.ts`, `src/data/roleplay.qc.test.ts`, `e2e/enterprise.spec.ts`. Does not edit `roleplay.ts`, SP04 components, tokens, popup fields.
 
 ## TL;DR
-Compose `/enterprise` from SP04 parts. New: enterprise hero copy, Benefits (3 cards), a coder-QC mockup (human coder's scores beside our flags, with line refs) in FeatureTabs' `evidence` slot, and the enterprise compare table. QC data is derived from `roleplay.ts`, so flags can never contradict the transcript; a unit test pins that. One brief example is false against the shared role-play and is corrected (see [OPEN] 1).
+Compose `/enterprise` from SP04 parts. New: enterprise hero copy, Benefits (3 cards), a coder-QC mockup (human coder's scores beside our flags, with line refs) in FeatureTabs' `evidence` slot, and the enterprise compare table. QC data is derived from `roleplay.ts`, so flags can never contradict the transcript; a unit test pins that. One brief example is false against the shared role-play and is corrected (see open item 1).
 
 ## Problem
 Orgs need to see "we check your coder's score against the session." The brief's example line contradicts the shared role-play (CRs at 44 and 52 sit inside "lines 40-60"). MI-literate reviewers would catch it. The page must also stay hidden from learners and from search engines.
@@ -19,7 +19,7 @@ Orgs need to see "we check your coder's score against the session." The brief's 
 |---|---|
 | Brief copy exact: hero, benefits, compare | Popup fields, HeroForm internals (SP03) |
 | QC mockup consistent with role-play, tested | Real coder data, accuracy figures, any price/number claims ("volume pricing" wording only) |
-| noindex + no inbound link from `/` | New tab/mockup frameworks, edits to SP04 files (except [OPEN] 5) |
+| noindex + no inbound link from `/` | New tab/mockup frameworks, edits to SP04 files (except open item 5) |
 | Anti-goals: no copy implying replacement of coders or MINT trainers | Reducing the tool to pass/fail on coders |
 
 ## Requirements
@@ -33,7 +33,7 @@ Orgs need to see "we check your coder's score against the session." The brief's 
 | 5 | `compare` | `CompareTable` enterprise | `section:compare` |
 | 6 | `team` | SP01, own CTA | own |
 
-**R2 Hero** (inline in `enterprise.astro`; does not depend on `Hero.astro`'s props, see [OPEN] 4). h1: "Quality-check your MITI coding. Every score, backed by the session." Sub: "We read each coded sample against its transcript and flag the scores the session doesn't support, with line references." Small line: same as `/` ("Role-play or de-identified transcripts. For practice and preparation, not official MITI coding.") [OPEN] 6.
+**R2 Hero** (inline in `enterprise.astro`; does not depend on `Hero.astro`'s props, see open item 4). h1: "Quality-check your MITI coding. Every score, backed by the session." Sub: "We read each coded sample against its transcript and flag the scores the session doesn't support, with line references." Small line: same as `/` ("Role-play or de-identified transcripts. For practice and preparation, not official MITI coding.") open item 6.
 
 **R3 Benefits** (`benefits.ts`, `BenefitsSection.astro`; 3 equal cards, headline + line, verbatim)
 - Bulk evaluations: "Volume pricing for evaluating many samples across your team or program."
@@ -64,8 +64,8 @@ Header summary: "3 supported, 2 flagged for review". Footnote microcopy: "Flags 
 **R5 QcMockup** (`mockups/QcMockup.astro`)
 - Layout matches SP04 Evidence: scorecard (left/top) + scrollable numbered transcript (right/bottom).
 - Scorecard rows: label, "Coder N", chip (text + color: "Supported" good, "Not supported" low), "Session supports N" for flagged rows. Flagged rows are buttons with `data-highlight-lines`; click highlights via SP04's generic `highlight.ts` (same attributes `data-highlight-lines`, `data-line`, `aria-pressed`, live region). Empathy flag pre-selected on load.
-- Transcript pane: all role-play lines. Reuse SP04's transcript markup if it is a component, else duplicate the few lines of markup ([OPEN] 5).
-- Tab label stays "Evidence" ([OPEN] 3).
+- Transcript pane: all role-play lines. Reuse SP04's transcript markup if it is a component, else duplicate the few lines of markup (open item 5).
+- Tab label stays "Evidence" (open item 3).
 
 **R6 Compare** (`compare.enterprise.ts` into `CompareTable`, `highlight` = Onolys column). Columns: Second human coder | Onolys evidence check. Rows: Checks every score (Yes / Yes); Points to the lines (Sometimes / Yes, linked lines); Turnaround (Days / Minutes); Scales with volume (Needs more coders / Yes).
 
@@ -97,8 +97,8 @@ enterprise.astro: hero(HeroForm) → BenefitsSection → FeatureTabs → Evaluat
 | 8 | Chips | Text + color ("Supported"/"Not supported") | Color only; "Wrong" | A11y rule; "wrong" overreaches, brief says "doesn't support" |
 
 ## Risks / Open Questions
-1. [OPEN] **Needs Tejit's OK:** change the brief's coder-QC example to exactly: "Empathy 5: not supported. No complex reflections at lines 53-66; line 58 concern missed." (brief says 40-60). Default adopted: 53-66.
-2. [OPEN] Coder's invented scores (CCT 3, SST 4, Partnership 4, Empathy 5, CR 7, extra CR at line 59) are Claude's content; brief gives only the Empathy example. Confirm; MI trainer should read it (owner step).
+1. [RESOLVED: approved exactly: "Empathy 5: not supported. No complex reflections at lines 53-66; line 58 concern missed."] **Owner OK:** change the brief's coder-QC example to exactly: "Empathy 5: not supported. No complex reflections at lines 53-66; line 58 concern missed." (brief says 40-60). Default adopted: 53-66.
+2. [RESOLVED: approved CCT 3, SST 4, Partnership 4, Empathy 5, CR 7 with extra CR at line 59] Coder's invented scores (CCT 3, SST 4, Partnership 4, Empathy 5, CR 7, extra CR at line 59) are Claude's content; brief gives only the Empathy example. Confirm; MI trainer should read it (owner step).
 3. [RESOLVED: keep "Evidence"] Tab label "Evidence" vs "Quality check". Default Evidence.
 4. [RESOLVED: inline hero in enterprise.astro] If `Hero.astro` accepts headline/sub props and a form slot, SP05 may reuse it. Default inline.
 5. [RESOLVED: SP04 exposes src/components/TranscriptPane.astro; QcMockup reuses it] Ask SP04 to expose its transcript pane as a component (`TranscriptPane.astro`) so QcMockup reuses it. Fallback: duplicate markup.
@@ -108,12 +108,12 @@ enterprise.astro: hero(HeroForm) → BenefitsSection → FeatureTabs → Evaluat
 9. [DEFERRED] Real coder data, per-coder report view, "export flags".
 
 ## Manual steps (owner-only)
-- Approve [OPEN] 1-2 wording; have one MI coder/trainer review the QC mockup before launch (brief risk).
+- Approve open item 1-2 wording; have one MI coder/trainer review the QC mockup before launch (brief risk).
 - Share `/enterprise` link directly with orgs (no link from `/`).
 
 ## Acceptance Criteria
 - Unit (`roleplay.qc.test.ts`): flagged range equals (previous CR line + 1, next CR line - 1) around line 58, i.e. [53, 66], and no CR in it; `missed` 58 is a client line inside range; `supported` values equal `roleplay.globals` and `summarize()` (Empathy 4, CR 6); coder values differ from supported only on flagged rows; `coderExtraCR` lines are counselor lines not coded CR and `coderCRCount - 6 = coderExtraCR.length`; all `cites` exist; rendered note text derives from data.
-- e2e (`enterprise.spec.ts`, desktop + Pixel 5): sections `hero, benefits, features, evaluates, compare, team` in order; h1, sub and 3 benefit cards verbatim; 3 trailing CTAs `data-trigger="section:<id>"`; QC mockup shows Empathy "Coder 5", "Not supported", the exact [OPEN] 1 line; clicking flagged Empathy row highlights lines 53-66 (`aria-pressed`), CR row highlights 59, second click clears; Complete and Feedback tabs render SP04 content; compare table exact columns/rows; no `$`, "accura", "replace" in `main`.
+- e2e (`enterprise.spec.ts`, desktop + Pixel 5): sections `hero, benefits, features, evaluates, compare, team` in order; h1, sub and 3 benefit cards verbatim; 3 trailing CTAs `data-trigger="section:<id>"`; QC mockup shows Empathy "Coder 5", "Not supported", the exact open item 1 line; clicking flagged Empathy row highlights lines 53-66 (`aria-pressed`), CR row highlights 59, second click clears; Complete and Feedback tabs render SP04 content; compare table exact columns/rows; no `$`, "accura", "replace" in `main`.
 - e2e noindex/isolation: `<meta name="robots">` contains `noindex`; `/` has no anchor whose href contains `enterprise` (checked on rendered DOM and raw HTML); `firebase.json` has `X-Robots-Tag: noindex` for `/enterprise`.
 - e2e popup: any CTA on `/enterprise` opens the dialog with enterprise fields (Organization, Samples per month present; "How often" absent) and a step-2 POST with `page:'enterprise'`.
 - e2e mobile 360px, each tab active: `scrollWidth <= clientWidth`; compare readable as cards.

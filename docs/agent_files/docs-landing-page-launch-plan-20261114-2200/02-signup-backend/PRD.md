@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Pasteable Apps Script web app that upserts two-step sign-ups into a Google Sheet, with a fixed JSON contract for SP03 and Node unit tests
 date: 2026-11-15
 ---
@@ -93,7 +93,7 @@ Code sharing: one file, `Code.gs`, with pure functions on top and `doPost`/`doGe
 
 ## Risks / Open Questions
 - [DEFERRED: verify at implementation] Is the Plan A response readable from localhost and from `miti.onolys.com`? Probe on both origins (localhost early, production after deploy). — needs owner's deployed URL
-- [OPEN] Which Google account hosts the script? A Workspace account can block "Anyone" access; use a personal account if so.
+- [RESOLVED: personal Gmail account (tejitpabari99@gmail.com) owns the Sheet and script] Which Google account hosts the script? A Workspace account can block "Anyone" access; use a personal account if so.
 - [DEFERRED: verify at implementation] Current Apps Script quotas for that account type (see above).
 - [DEFERRED: verify at implementation] Does the apostrophe show visibly in a plain-text-formatted cell? Verify on the first injection test row; if ugly, drop to format-only or prefix-only.
 - [RESOLVED: lock + non-blank-only update makes order irrelevant] Hero submit and popup submit can overlap; the lock covers the race. Fire-and-forget by SP03 is acceptable, but request ordering is not guaranteed, and since the update is non-blank-only the final row is correct either way.
