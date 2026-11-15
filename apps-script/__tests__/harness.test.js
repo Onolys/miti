@@ -50,17 +50,17 @@ describe('Apps Script test harness', () => {
   it('records lock acquisition and release, and can throw on waitLock', () => {
     const harness = createAppsScriptHarness();
     const lock = harness.LockService.getScriptLock();
-    lock.waitLock(10000);
+    lock.waitLock(5000);
     lock.releaseLock();
     expect(harness.events).toEqual([
-      { type: 'waitLock', timeout: 10000 },
+      { type: 'waitLock', timeout: 5000 },
       'releaseLock',
     ]);
 
     const timeout = new Error('Lock timed out');
     const busyHarness = createAppsScriptHarness({ waitLockError: timeout });
-    expect(() => busyHarness.LockService.getScriptLock().waitLock(10000)).toThrow(timeout);
-    expect(busyHarness.events).toEqual([{ type: 'waitLock', timeout: 10000 }]);
+    expect(() => busyHarness.LockService.getScriptLock().waitLock(5000)).toThrow(timeout);
+    expect(busyHarness.events).toEqual([{ type: 'waitLock', timeout: 5000 }]);
   });
 
   it('isolates sheet state between executions', () => {

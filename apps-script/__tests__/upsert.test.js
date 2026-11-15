@@ -25,6 +25,30 @@ describe('Sheet header and upsert', () => {
     expect(harness.formats).toContainEqual({ row: 1, column: 1, numRows: 1000, numColumns: schema.length, format: '@' });
   });
 
+  it('applies the plain-text format only when header columns are created, not on every call', () => {
+    const harness = createAppsScriptHarness();
+    harness.context.ensureHeader(harness.sheet);
+    expect(harness.formats).toHaveLength(1);
+    harness.context.ensureHeader(harness.sheet);
+    save(harness, signup);
+    save(harness, { ...signup, step: 2, role: 'Researcher' }, later);
+    expect(harness.formats).toHaveLength(1);
+  });
+
+  it('updates an existing row with one range read and one range write', () => {
+    const harness = createAppsScriptHarness();
+    save(harness, signup);
+    const getRange = vi.spyOn(harness.sheet, 'getRange');
+    const headers = harness.context.ensureHeader(harness.sheet);
+    getRange.mockClear();
+    const validated = harness.context.parseAndValidate(JSON.stringify({ ...signup, step: 2, role: 'Researcher', src: 'other' }));
+    harness.context.upsert(harness.sheet, validated.record, later, headers);
+    // email + page lookups, then exactly one whole-row range for the update.
+    expect(getRange).toHaveBeenCalledTimes(3);
+    expect(getRange).toHaveBeenLastCalledWith(2, 1, 1, schema.length);
+    expect(record(harness)).toMatchObject({ first_seen: first, updated: later, role: 'Researcher', src: 'newsletter' });
+  });
+
   it('appends missing headers without moving owner columns or existing rows', () => {
     const harness = createAppsScriptHarness({ rows: [['owner_note', 'email', 'page'], ['keep', 'a@b.co', 'learner']] });
     const expected = ['owner_note', 'email', 'page', ...schema.filter((column) => !['email', 'page'].includes(column))];

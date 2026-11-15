@@ -1,5 +1,7 @@
 import { isValidEmail } from './body';
-import { postSignup } from './client';
+import { postSignup, warmUp, type SignupResult } from './client';
+import { setPendingStep1 } from './pending';
+import { setSubmitting } from './spinner';
 import { track } from '../track';
 
 const initialized = new WeakSet<HTMLFormElement>();
@@ -16,6 +18,8 @@ export function initHeroForms(root: ParentNode = document): void {
     const row = form.querySelector<HTMLElement>('[data-hero-row]')!;
     let busy = false;
     let completed = false;
+
+    email.addEventListener('focus', () => warmUp(), { once: true });
 
     email.addEventListener('input', () => {
       email.setAttribute('aria-invalid', 'false');
@@ -35,25 +39,47 @@ export function initHeroForms(root: ParentNode = document): void {
       email.setAttribute('aria-invalid', 'false');
       error.textContent = '';
       busy = true;
-      button.disabled = true;
+      setSubmitting(button, true);
       form.setAttribute('aria-busy', 'true');
 
-      const result = await postSignup(1, { email: value, honeypot: honeypot.value });
+      // Optimistic: open the popup now; step 1 continues in the background.
+      const request: Promise<SignupResult> = postSignup(1, { email: value, honeypot: honeypot.value });
+      setPendingStep1(request);
+      document.dispatchEvent(new CustomEvent('miti:open-popup', {
+        detail: { trigger: 'hero', email: value },
+      }));
+
+      const result = await request;
       busy = false;
       form.setAttribute('aria-busy', 'false');
       if (result.ok) {
         completed = true;
         track('signup_step1');
-        const thanks = document.createElement('p');
-        thanks.setAttribute('role', 'status');
-        thanks.textContent = "Thanks. We'll reach out with early access information in a few weeks.";
-        row.replaceWith(thanks);
+        const done = document.createElement('p');
+        done.className = 'hero-signup-success';
+        done.setAttribute('role', 'status');
+        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        icon.setAttribute('viewBox', '0 0 20 20');
+        icon.setAttribute('width', '20');
+        icon.setAttribute('height', '20');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.setAttribute('focusable', 'false');
+        const mark = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        mark.setAttribute('d', 'M4 10.5l4 4 8-9');
+        mark.setAttribute('fill', 'none');
+        mark.setAttribute('stroke', 'currentColor');
+        mark.setAttribute('stroke-width', '2.4');
+        mark.setAttribute('stroke-linecap', 'round');
+        mark.setAttribute('stroke-linejoin', 'round');
+        icon.append(mark);
+        const text = document.createElement('span');
+        text.textContent = 'You have been signed up for early access.';
+        done.append(icon, text);
+        row.replaceWith(done);
       } else {
-        button.disabled = false;
+        setSubmitting(button, false);
+        error.textContent = 'Something went wrong. Try again, or email tejitpabari99@gmail.com.';
       }
-      document.dispatchEvent(new CustomEvent('miti:open-popup', {
-        detail: { trigger: 'hero', email: value },
-      }));
     });
   }
 }

@@ -56,6 +56,48 @@
   cursor: wait;
 }
 
+.signup-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signup-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgb(255 255 255 / 40%);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: signup-spin 0.8s linear infinite;
+}
+
+@keyframes signup-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signup-spinner {
+    animation-duration: 2.4s;
+  }
+}
+
+.hero-signup-success {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border: 1px solid #b8dfc9;
+  border-radius: 10px;
+  background: #e5f4ec;
+  color: #175b42;
+  font-weight: 600;
+}
+
+.hero-signup-success svg {
+  flex-shrink: 0;
+}
+
 .signup-input:focus-visible,
 .signup-submit:focus-visible {
   outline: 3px solid var(--color-accent);

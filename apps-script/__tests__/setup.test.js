@@ -22,7 +22,7 @@ describe('Apps Script spreadsheet configuration', () => {
     expect(open).toHaveBeenCalledExactlyOnceWith('test-spreadsheet-id');
     expect(active).not.toHaveBeenCalled();
     expect(harness.sheet.getLastRow()).toBe(2);
-    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 10000 }, 'flush', 'releaseLock']);
+    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 5000 }, 'flush', 'releaseLock']);
   });
 
   it('captures the bound spreadsheet ID in an editor-run setup', () => {
@@ -53,7 +53,7 @@ describe('Apps Script spreadsheet configuration', () => {
     const open = vi.spyOn(harness.SpreadsheetApp, 'openById');
     expect(post(harness)).toEqual({ ok: false, error: 'server' });
     expect(open).not.toHaveBeenCalled();
-    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 10000 }, 'releaseLock']);
+    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 5000 }, 'releaseLock']);
     expect(harness.sheet.getLastRow()).toBe(0);
   });
 
@@ -61,7 +61,7 @@ describe('Apps Script spreadsheet configuration', () => {
     const harness = createAppsScriptHarness();
     harness.scriptProperties.setProperty(propertyKey, 'inaccessible-id');
     expect(post(harness)).toEqual({ ok: false, error: 'server' });
-    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 10000 }, 'releaseLock']);
+    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 5000 }, 'releaseLock']);
   });
 
   it('keeps doGet independent of spreadsheet configuration', () => {

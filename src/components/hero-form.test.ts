@@ -14,6 +14,9 @@ it.each([
   const form = document.querySelector('form')!;
   expect(form.id).toBe(id);
   expect(form.hasAttribute('novalidate')).toBe(true);
+  // Without JS a native submit must never put the email into the URL.
+  expect(form.getAttribute('method')).toBe('post');
+  expect(form.getAttribute('action')).toBe('#');
   expect(form.hasAttribute('data-hero-signup')).toBe(true);
   const email = form.querySelector<HTMLInputElement>('input[name="email"]')!;
   expect(email.type).toBe('email');

@@ -2,13 +2,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SignupResult } from '../client';
 
-const { postSignup, track } = vi.hoisted(() => ({ postSignup: vi.fn(), track: vi.fn() }));
-vi.mock('../client', () => ({ postSignup }));
+const { postSignup, track, warmUp } = vi.hoisted(() => ({ postSignup: vi.fn(), track: vi.fn(), warmUp: vi.fn() }));
+vi.mock('../client', () => ({ postSignup, warmUp }));
 vi.mock('../../track', () => ({ track }));
 
 beforeEach(() => {
   postSignup.mockReset();
   track.mockReset();
+  warmUp.mockReset();
   document.body.innerHTML = `<form data-hero-signup novalidate>
     <div data-hero-row><label for="hero-email">Email</label><input id="hero-email" name="email" type="email" aria-describedby="hero-error" aria-invalid="false"><button type="submit">Get early access</button></div>
     <p id="hero-error" data-email-error aria-live="polite"></p>
@@ -63,50 +64,76 @@ describe('hero email capture', () => {
     expect(error.textContent).toBe('');
   });
 
-  it('guards repeated submits, sends the honeypot and replaces the row before opening the popup on success', async () => {
+  it('opens the popup at once with a spinner, guards repeats, then shows the success line when step 1 resolves', async () => {
     let finish!: (result: SignupResult) => void;
     postSignup.mockReturnValue(new Promise<SignupResult>((resolve) => { finish = resolve; }));
     const { form, email, button } = await initialize();
     email.value = '  Person@example.com ';
     document.querySelector<HTMLInputElement>('[name="company_website"]')!.value = 'bot';
-    const opened = vi.fn((event: Event) => {
-      expect(document.querySelector('[data-hero-row]')).toBeNull();
-      expect(document.querySelector('[role="status"]')?.textContent).toBe("Thanks. We'll reach out with early access information in a few weeks.");
-      expect((event as CustomEvent).detail).toEqual({ trigger: 'hero', email: 'Person@example.com' });
-    });
+    const opened = vi.fn();
     document.addEventListener('miti:open-popup', opened, { once: true });
     submit(form);
     submit(form);
     expect(postSignup).toHaveBeenCalledExactlyOnceWith(1, { email: 'Person@example.com', honeypot: 'bot' });
+    // Popup opens before the network answers.
+    expect(opened).toHaveBeenCalledTimes(1);
+    expect((opened.mock.calls[0][0] as CustomEvent).detail).toEqual({ trigger: 'hero', email: 'Person@example.com' });
     expect(button.disabled).toBe(true);
+    expect(button.querySelector('.signup-spinner')).not.toBeNull();
+    expect(button.textContent).toBe('Submitting');
     expect(form.getAttribute('aria-busy')).toBe('true');
-    expect(opened).not.toHaveBeenCalled();
+    expect(document.querySelector('[role="status"]')).toBeNull();
     finish({ ok: true, confirmed: true });
-    await vi.waitFor(() => expect(opened).toHaveBeenCalledTimes(1));
+    await vi.waitFor(() => expect(document.querySelector('[role="status"]')).not.toBeNull());
+    expect(document.querySelector('[data-hero-row]')).toBeNull();
+    expect(document.querySelector('[role="status"]')?.textContent).toBe('You have been signed up for early access.');
+    expect(document.querySelector('[role="status"] svg')).not.toBeNull();
     expect(track).toHaveBeenCalledExactlyOnceWith('signup_step1');
     expect(form.getAttribute('aria-busy')).toBe('false');
     submit(form);
     expect(postSignup).toHaveBeenCalledTimes(1);
   });
 
-  it('opens the popup after a failed hero save, leaves the form usable and shows no error', async () => {
+  it('exposes the in-flight step 1 so the dialog can await it', async () => {
+    let finish!: (result: SignupResult) => void;
+    postSignup.mockReturnValue(new Promise<SignupResult>((resolve) => { finish = resolve; }));
+    const { form, email } = await initialize();
+    email.value = 'a@b.co';
+    submit(form);
+    const { getPendingStep1 } = await import('../pending');
+    const pending = getPendingStep1();
+    expect(pending).not.toBeNull();
+    finish({ ok: true, confirmed: true });
+    await pending;
+    await vi.waitFor(() => expect(getPendingStep1()).toBeNull());
+  });
+
+  it('restores the button and shows an error after a failed hero save, popup already open', async () => {
     postSignup.mockResolvedValue({ ok: false, error: 'network' });
     const { form, email, button, error } = await initialize();
     email.value = 'Person@example.com';
     const opened = vi.fn();
     document.addEventListener('miti:open-popup', opened, { once: true });
     submit(form);
-    await vi.waitFor(() => expect(opened).toHaveBeenCalledTimes(1));
-    expect((opened.mock.calls[0][0] as CustomEvent).detail).toEqual({ trigger: 'hero', email: 'Person@example.com' });
+    expect(opened).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(button.disabled).toBe(false));
+    expect(button.textContent).toBe('Get early access');
+    expect(button.querySelector('.signup-spinner')).toBeNull();
     expect(document.querySelector('[data-hero-row]')).not.toBeNull();
     expect(document.querySelector('[role="status"]')).toBeNull();
-    expect(button.disabled).toBe(false);
     expect(form.getAttribute('aria-busy')).toBe('false');
-    expect(error.textContent).toBe('');
+    expect(error.textContent).toBe('Something went wrong. Try again, or email tejitpabari99@gmail.com.');
     expect(email.value).toBe('Person@example.com');
     expect(track).not.toHaveBeenCalled();
     submit(form);
     await vi.waitFor(() => expect(postSignup).toHaveBeenCalledTimes(2));
+  });
+
+  it('warms up the backend once on first email focus', async () => {
+    const { email } = await initialize();
+    email.dispatchEvent(new Event('focus'));
+    email.dispatchEvent(new Event('focus'));
+    expect(warmUp).toHaveBeenCalledTimes(1);
   });
 
   it('treats an unconfirmed Plan B result as success', async () => {
