@@ -28,7 +28,7 @@ const gaId = import.meta.env.PUBLIC_GA_ID ?? '';
     <TopBar />
     <main><slot /></main>
     <Footer />
-    <SignupDialog />
+    <SignupDialog {page} />
     <script>
       import '../lib/track';
       import '../lib/popup';
