@@ -43,6 +43,8 @@ describe('team section', () => {
       expect(bio.querySelectorAll('strong')).toHaveLength(1);
       const image = card.querySelector('img')!;
       expect(image.alt).toBe(`Photo of ${member.name}`);
+      expect(Number(image.getAttribute('width'))).toBeGreaterThanOrEqual(208);
+      expect(Number(image.getAttribute('height'))).toBeGreaterThanOrEqual(208);
       const link = card.querySelector('a')!;
       expect(link.href).toBe(member.linkedin);
       expect(link.getAttribute('aria-label')).toBe(`${member.name} on LinkedIn`);
@@ -60,6 +62,10 @@ describe('team section', () => {
     const partners = doc.querySelector('#team .partners')!;
     expect(partners.textContent).toBe('Backed by researchers from Harvard Medical School, Columbia Medical Center and Massachusetts General Hospital.');
     expect(Array.from(partners.querySelectorAll('strong')).map((el) => el.textContent)).toEqual(['Harvard Medical School', 'Columbia Medical Center', 'Massachusetts General Hospital']);
+    const breaks = partners.querySelectorAll('br.desktop-break');
+    expect(breaks).toHaveLength(1);
+    expect(breaks[0].nextSibling?.textContent).toBe('and ');
+    expect(partners.querySelector('br.desktop-break')?.previousSibling?.textContent).toBe(' ');
     expect(doc.querySelectorAll('[data-open-popup]')).toHaveLength(1);
     expect(doc.querySelector('[data-open-popup]')?.getAttribute('data-trigger')).toBe('team');
     expect(doc.querySelector('#team a[href^="mailto:"]')).toBeNull();

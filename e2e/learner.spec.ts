@@ -47,6 +47,7 @@ test('learner sections, approved copy, comparison and CTAs are complete', async 
   expect(await main.evaluate((element) => element.lastElementChild?.id)).toBe('team');
   expect(await main.evaluate((element) => element.nextElementSibling?.tagName)).toBe('FOOTER');
   await expect(page.locator('footer')).toContainText('Not official MITI coding and cannot be submitted as one.');
+  await expect(page.locator('footer')).not.toContainText('Note:');
   for (const section of ['features', 'evaluates', 'compare']) {
     const cta = page.locator(`#${section} .cta-row > [data-open-popup]`);
     await expect(cta).toHaveAttribute('data-trigger', `section:${section}`);
@@ -133,11 +134,29 @@ test('team cards align bios and LinkedIn icons at 1440px', async ({ page }) => {
   await expect(page.locator('#team a[href^="mailto:"]')).toHaveCount(0);
   await expect(page.locator('#team .partners strong')).toHaveText(['Harvard Medical School', 'Columbia Medical Center', 'Massachusetts General Hospital']);
   expect(await page.locator('#team .partners').evaluate((el) => getComputedStyle(el).textAlign)).toBe('center');
+  await page.locator('#team').scrollIntoViewIfNeeded();
+  await expect.poll(() => cards.locator('img').evaluateAll((els) => els.every((el) => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0))).toBe(true);
+  const boxes = await cards.locator('img').evaluateAll((els) => els.map((el) => [el.getBoundingClientRect().width, el.getBoundingClientRect().height, (el as HTMLImageElement).naturalWidth]));
+  for (const [w, h, nat] of boxes) {
+    expect([w, h]).toEqual([104, 104]);
+    expect(nat).toBeGreaterThanOrEqual(208);
+  }
+  // partner line: "and Massachusetts..." starts a new line on desktop
+  const lines = await page.locator('#team .partners').evaluate((el) => {
+    const strong = el.querySelectorAll('strong');
+    return [strong[1].getBoundingClientRect().top, strong[2].getBoundingClientRect().top];
+  });
+  expect(lines[1]).toBeGreaterThan(lines[0] + 10);
+  // footer list is one line on desktop
+  const items = await page.locator('footer li').evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
+  expect(new Set(items).size).toBe(1);
 });
 
 test('390px: no horizontal scroll, compare tabs switch, compact team cards', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await visit(page);
+  expect(await page.locator('#team img').first().evaluate((el) => el.getBoundingClientRect().width)).toBe(76);
+  expect(await page.locator('#team .partners br.desktop-break').evaluate((el) => getComputedStyle(el).display)).toBe('none');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   const features = page.locator('#features [data-tabs]');
   await expect(features.getByRole('tablist')).toHaveAttribute('aria-orientation', 'horizontal');
@@ -162,7 +181,7 @@ test('390px: no horizontal scroll, compare tabs switch, compact team cards', asy
   await cmp.getByRole('tab', { name: 'AI chatbots' }).click();
   await expect(rows.nth(5)).toContainText('—');
   const photo = await page.locator('#team article img').first().boundingBox();
-  expect(photo!.width).toBeLessThanOrEqual(64);
+  expect(photo!.width).toBeLessThanOrEqual(76);
   const card = await page.locator('#team article').first().boundingBox();
   expect(card!.height).toBeLessThan(200);
 });

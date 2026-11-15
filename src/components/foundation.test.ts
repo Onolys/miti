@@ -53,7 +53,10 @@ it.each([
   ['enterprise', 'Individuals?', '/', 'Click here — evaluate your own MI session with evidence for every score.'],
 ] as const)('renders the note, page switch, contact and copyright footer (%s)', async (page, lead, href, rest) => {
   const doc = await render(Footer, { page });
-  expect(doc.querySelector('footer h3')?.textContent).toBe('Note:');
+  expect(doc.querySelector('footer h3')).toBeNull();
+  expect(doc.querySelector('footer')?.textContent).not.toContain('Note:');
+  expect(doc.querySelectorAll('footer ul')).toHaveLength(1);
+  expect(doc.querySelector('footer ul')?.hasAttribute('data-inline-list')).toBe(true);
   expect(Array.from(doc.querySelectorAll('footer li'), (li) => li.textContent)).toEqual([
     'Not official MITI coding and cannot be submitted as one.',
     'Use it to practice and prepare.',

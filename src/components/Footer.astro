@@ -7,8 +7,7 @@ const { page } = Astro.props;
 ---
 <footer>
   <div class="container">
-    <h3>Note:</h3>
-    <ul>
+    <ul data-inline-list>
       <li>Not official MITI coding and cannot be submitted as one.</li>
       <li>Use it to practice and prepare.</li>
       <li>Role-play or de-identified transcripts only.</li>
@@ -24,8 +23,9 @@ const { page } = Astro.props;
 <style>
   footer { background: var(--tone-footer); color: #dcebe9; padding-block: 3.5rem; font-size: 0.95rem; overflow-wrap: anywhere; }
   a { color: #9fe3d8; }
-  h3 { margin: 0 0 0.6rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: #9fcfc8; }
-  ul { margin: 0 0 1.75rem; padding-left: 1.2rem; display: grid; gap: 0.25rem; }
+  ul { margin: 0 0 1.75rem; padding: 0; list-style: none; }
+  li { display: inline; }
+  li + li::before { content: ' · '; white-space: pre; color: #9fcfc8; }
   p { margin: 0; }
   p + p { margin-top: 0.75rem; }
   .copy { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.15); font-size: 0.8rem; color: #9fcfc8; }
