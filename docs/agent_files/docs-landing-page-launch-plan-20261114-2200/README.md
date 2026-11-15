@@ -10,7 +10,7 @@ date: 2026-11-15
 
 ## Current progress
 
-SP01 Tasks 1–9 implemented; CI and three-persona review passed. SP02 implementation review passed; Task 6 is blocked: local Plan A replies are readable, but three live save requests returned `server`. SP03 Tasks 1–4 done, Task 5 in-progress; independent SP04 Task 1 done, Task 2 in-progress; SP05 todo. The owner reports Namecheap, Firebase, GitHub, Sheet/Apps Script and GA4 setup completed. Endpoint health, GitHub configuration names/variable values, and DNS A records have preliminary independent verification; production-origin CORS, Sheet save/row behavior, valid custom-domain HTTPS and production acceptance remain outstanding. Current DNS points to Firebase; cached older records and Firebase ownership/certificate checks indicate propagation/verification remains pending. See each TASKS.md for the resume state.
+SP01 Tasks 1–9 implemented; CI and three-persona review passed. SP02 implementation review passed; Task 6 is blocked: local Plan A replies are readable, but three live save requests returned `server`. SP03 Tasks 1–7 implemented; CI passed 277 unit tests and 36 browser tests, independent review pending. SP04 Tasks 1–5 done, Task 6 in-progress; SP05 todo. The owner reports Namecheap, Firebase, GitHub, Sheet/Apps Script and GA4 setup completed. Endpoint health, GitHub configuration names/variable values, and DNS A records have preliminary independent verification; production-origin CORS, Sheet save/row behavior, valid custom-domain HTTPS and production acceptance remain outstanding. Current DNS points to Firebase; cached older records and Firebase ownership/certificate checks indicate propagation/verification remains pending. See each TASKS.md for the resume state.
 
 ## Sub-projects
 

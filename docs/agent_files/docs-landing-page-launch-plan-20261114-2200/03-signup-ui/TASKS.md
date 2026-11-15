@@ -13,9 +13,9 @@ Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-
 | 2 | Network client, Plan A/B switch + unit tests | 1, SP01 T1 | done |
 | 3 | HeroForm, honeypot, temporary shell placement | 2, SP01 T3 | done |
 | 4 | SignupDialog and Base mount | 1, 2, 3, SP01 T3 | done |
-| 5 | Playwright flows (desktop + Pixel 5) | 3, 4, SP01 T7 | in-progress |
-| 6 | Accessibility, storage and dev-mode checks | 5 | todo |
-| 7 | Green CI and deferred verifications | 6, SP01 T8 | todo |
+| 5 | Playwright flows (desktop + Pixel 5) | 3, 4, SP01 T7 | done |
+| 6 | Accessibility, storage and dev-mode checks | 5 | done |
+| 7 | Green CI and deferred verifications | 6, SP01 T8 | done |
 
 ## Task 1 — Field config and body builder + unit tests
 What it is / what it means: The data and pure logic everything else reads (R3, R5 body; decision 3 keys; resolved open item 4).
