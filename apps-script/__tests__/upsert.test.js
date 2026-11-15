@@ -36,6 +36,15 @@ describe('Sheet header and upsert', () => {
     expect(sheetWide()).toHaveLength(1);
   });
 
+  it('grows a full sheet before writing a new signup row', () => {
+    const harness = createAppsScriptHarness({ rows: [schema, ['t', 't', 'learner', '', 'x@y.co'], ['t', 't', 'learner', '', 'z@y.co']], maxRows: 3 });
+    expect(harness.sheet.getMaxRows()).toBe(3);
+    save(harness, signup);
+    expect(harness.sheet.getMaxRows()).toBe(4);
+    expect(record(harness, 4).email).toBe('a@b.co');
+    expect(harness.formats).toContainEqual({ row: 4, column: 1, numRows: 1, numColumns: schema.length, format: '@' });
+  });
+
   it('updates an existing row writing only the changed cells', () => {
     const harness = createAppsScriptHarness();
     save(harness, signup);

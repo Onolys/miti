@@ -99,7 +99,10 @@ function upsert(sheet, record, now, headers) {
       return name === 'email' ? record[name] : formulaSafe(record[name]);
     });
     // Plain-text format on the target row first, so appended rows are never auto-parsed.
-    sheet.getRange(sheet.getLastRow() + 1, 1, 1, headers.length)
+    // getRange throws past the sheet's last row, so grow the sheet before writing.
+    var newRow = sheet.getLastRow() + 1;
+    if (newRow > sheet.getMaxRows()) sheet.insertRowsAfter(sheet.getMaxRows(), 1);
+    sheet.getRange(newRow, 1, 1, headers.length)
       .setNumberFormat('@').setValues([values]);
     return;
   }
