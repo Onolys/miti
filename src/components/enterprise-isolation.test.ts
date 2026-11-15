@@ -26,7 +26,12 @@ describe('enterprise search and navigation isolation', () => {
     const container = await AstroContainer.create();
     const doc = new JSDOM(await container.renderToString(Learner)).window.document;
     const links = Array.from(doc.querySelectorAll('[href*="enterprise" i]'));
-    expect(links.map((link) => link.closest('header, footer, main')?.tagName)).toEqual(['HEADER', 'FOOTER']);
+    // The mobile menu panel sits outside <header> (backdrop-filter would trap its fixed positioning).
+    const zones = links.map((link) => {
+      const zone = link.closest('header, footer, main, #mobile-nav');
+      return zone?.id === 'mobile-nav' ? 'MOBILE-NAV' : zone?.tagName;
+    });
+    expect(zones).toEqual(['HEADER', 'MOBILE-NAV', 'FOOTER']);
     expect(doc.querySelector('main [href*="enterprise" i]')).toBeNull();
     expect(doc.querySelector('dialog')).not.toBeNull();
     for (const robots of doc.querySelectorAll('meta[name="robots"]')) {
