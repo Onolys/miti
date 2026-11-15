@@ -75,14 +75,14 @@ describe('postSignup Plan A', () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
-  it.each(['fetch', 'body'] as const)('aborts after 10 seconds including a stalled %s', async (stall) => {
+  it.each(['fetch', 'body'] as const)('aborts after 12 seconds including a stalled %s', async (stall) => {
     const pending = new Promise<never>(() => {});
     fetchMock.mockImplementation(() => stall === 'fetch'
       ? pending
       : Promise.resolve({ ok: true, json: () => pending } as unknown as Response));
     const { postSignup } = await import('../client');
     const result = postSignup(1, data);
-    await vi.advanceTimersByTimeAsync(9_999);
+    await vi.advanceTimersByTimeAsync(11_999);
     const signal = fetchMock.mock.calls[0][1]?.signal;
     expect(signal?.aborted).toBe(false);
     await vi.advanceTimersByTimeAsync(1);
@@ -162,5 +162,28 @@ describe('postSignup without an endpoint', () => {
     expect(warn).not.toHaveBeenCalled();
     expect(log).not.toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('keeps the client timeout above the 5 second server lock wait so busy replies can arrive', async () => {
+    const { REQUEST_TIMEOUT_MS } = await import('../client');
+    expect(REQUEST_TIMEOUT_MS).toBeGreaterThanOrEqual(5_000 + 5_000);
+  });
+
+  it('warms up the endpoint with one fire-and-forget GET per page load and ignores errors', async () => {
+    fetchMock.mockRejectedValue(new Error('offline'));
+    const { warmUp } = await import('../client');
+    warmUp();
+    warmUp();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0]).toBe(endpoint);
+    expect(fetchMock.mock.calls[0][1]?.method).toBe('GET');
+    await vi.advanceTimersByTimeAsync(0);
+  });
+
+  it('skips the warm-up when the URL is unset', async () => {
+    vi.stubEnv('PUBLIC_SIGNUP_URL', '');
+    const { warmUp } = await import('../client');
+    warmUp();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

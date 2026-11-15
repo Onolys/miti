@@ -16,6 +16,8 @@
 
 Only editor setup uses `SpreadsheetApp.getActiveSpreadsheet()`. Web-app requests read the saved property and call `SpreadsheetApp.openById()` because active-container methods are unavailable in web apps. The `signups` tab is created on the first valid POST. A missing configuration or inaccessible Sheet returns `{"ok":false,"error":"server"}`. The healthcheck does not check storage configuration, so verify setup and run the POST probe too. Setup normally runs once; rerun it from the intended bound Sheet editor if you need to restore the saved configuration.
 
+**Redeploy required for every `Code.gs` change** (for example the 5 second lock wait and batched writes): the owner must redeploy the web app manually, or the live endpoint keeps running the old code.
+
 Saving an editor change does **not** update the live web app. To update it, choose **Deploy → Manage deployments → edit the existing deployment → Version: New version → Deploy**. This preserves the `/exec` URL. Creating another deployment creates a different URL.
 
 ## Browser probe
