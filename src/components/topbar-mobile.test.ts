@@ -19,7 +19,7 @@ describe('TopBar mobile nav', () => {
     expect(button.compareDocumentPosition(doc.querySelector('.brand')!) & 4).toBeTruthy();
   });
 
-  it('renders a closed side panel with the section links and secondary link', async () => {
+  it('renders a closed side panel with only the section links', async () => {
     const doc = await render('learner');
     const panel = doc.getElementById('mobile-nav')!;
     expect(panel).not.toBeNull();
@@ -32,15 +32,19 @@ describe('TopBar mobile nav', () => {
       ['Evaluation', '#evaluates'],
       ['Comparison', '#compare'],
       ['Team', '#team'],
-      ['Enterprise', '/enterprise'],
     ]);
     expect(doc.querySelector('.menu-backdrop')).not.toBeNull();
   });
 
-  it('shows Individuals as the secondary link on the enterprise page', async () => {
-    const doc = await render('enterprise');
-    const last = [...doc.querySelectorAll('#mobile-nav a')].pop()!;
-    expect(last.textContent?.trim()).toBe('Individuals');
-    expect(last.getAttribute('href')).toBe('/');
+  it('keeps the secondary link in the top bar, just before the CTA, and out of the panel', async () => {
+    for (const [page, label, href] of [['learner', 'Enterprise', '/enterprise'], ['enterprise', 'Individuals', '/']] as const) {
+      const doc = await render(page);
+      const secondary = doc.querySelector('header .secondary')!;
+      expect(secondary.textContent?.trim()).toBe(label);
+      expect(secondary.getAttribute('href')).toBe(href);
+      expect(secondary.nextElementSibling?.classList.contains('cta')).toBe(true);
+      expect(doc.querySelector('#mobile-nav .panel-secondary')).toBeNull();
+      expect([...doc.querySelectorAll('#mobile-nav a')].map((a) => a.textContent?.trim())).not.toContain(label);
+    }
   });
 });

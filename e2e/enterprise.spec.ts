@@ -128,8 +128,7 @@ test('enterprise is noindex and the learner page links to enterprise only via he
   expect(response.ok()).toBe(true);
   expect(await response.text()).toContain('href="/enterprise"');
   await page.goto('/');
-  // header, mobile menu panel (outside header), footer
-  await expect(page.locator('[href*="enterprise" i]')).toHaveCount(3);
+  await expect(page.locator('[href*="enterprise" i]')).toHaveCount(2);
   await expect(page.locator('header a[href="/enterprise"]')).toHaveText('Enterprise');
   await expect(page.locator('footer a[href="/enterprise"]')).toHaveCount(1);
 });
