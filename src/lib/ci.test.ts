@@ -22,6 +22,13 @@ it('checks pushes and pull requests with a reproducible supported Node runtime',
   });
 });
 
+it('cancels stale PR workflows before their tests finish while keeping push runs independent', () => {
+  expect(workflow().concurrency).toEqual({
+    group: 'ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}',
+    'cancel-in-progress': "${{ github.event_name == 'pull_request' }}",
+  });
+});
+
 it('runs validation before browser tests using public dummy configuration', () => {
   const job = workflow().jobs.test;
   expect(job.env).toMatchObject({
