@@ -18,6 +18,12 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 5'] } },
   ],
   webServer: {
+    // Always exercise the real client against intercepted requests, independent of local env files.
+    env: {
+      PUBLIC_SIGNUP_URL: 'https://script.google.com/macros/s/playwright-mock/exec',
+      PUBLIC_SIGNUP_PLAN: 'A',
+      PUBLIC_GA_ID: 'G-PLAYWRIGHT',
+    },
     // Keep Astro 7 in the foreground when it detects an agent; Playwright owns cleanup.
     command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 4321 --ignore-lock',
     url: 'http://127.0.0.1:4321',

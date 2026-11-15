@@ -63,6 +63,21 @@ export function initSignupDialog(): void {
   for (const closeButton of dialog.querySelectorAll<HTMLButtonElement>('[data-signup-close]')) {
     closeButton.addEventListener('click', close);
   }
+  // Keep Tab cycling in the form instead of moving to browser chrome at its edges.
+  dialog.addEventListener('keydown', (event) => {
+    if (event.key !== 'Tab') return;
+    const controls = Array.from(dialog.querySelectorAll<HTMLElement>('button,input,select,textarea,a[href],[tabindex]'))
+      .filter((control) => control.tabIndex >= 0 && !control.matches(':disabled') &&
+        !control.closest('[hidden],[inert]') && control.getClientRects().length > 0);
+    const first = controls[0];
+    const last = controls.at(-1);
+    if (!first || !last) return;
+    const active = document.activeElement;
+    if (event.shiftKey ? active === first || !controls.includes(active as HTMLElement) : active === last) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+    }
+  });
   dialog.addEventListener('cancel', (event) => {
     event.preventDefault();
     close();
