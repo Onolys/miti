@@ -26,7 +26,8 @@ describe('enterprise search and navigation isolation', () => {
     const container = await AstroContainer.create();
     const doc = new JSDOM(await container.renderToString(Learner)).window.document;
     const links = Array.from(doc.querySelectorAll('[href*="enterprise" i]'));
-    expect(links.map((link) => link.closest('header, footer, main')?.tagName)).toEqual(['HEADER', 'FOOTER']);
+    const zones = links.map((link) => link.closest('header, footer, main')?.tagName);
+    expect(zones).toEqual(['HEADER', 'FOOTER']);
     expect(doc.querySelector('main [href*="enterprise" i]')).toBeNull();
     expect(doc.querySelector('dialog')).not.toBeNull();
     for (const robots of doc.querySelectorAll('meta[name="robots"]')) {
