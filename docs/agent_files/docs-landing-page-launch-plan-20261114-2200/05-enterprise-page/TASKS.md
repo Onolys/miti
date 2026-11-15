@@ -9,8 +9,8 @@ Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | QC data (`roleplay.qc.ts`) and its pinning test | SP04 T1, SP04 T2 | todo |
-| 2 | Benefits data and `BenefitsSection` | SP01 T3 | todo |
+| 1 | QC data (`roleplay.qc.ts`) and its pinning test | SP04 T1, SP04 T2 | done |
+| 2 | Benefits data and `BenefitsSection` | SP01 T3 | in-progress |
 | 3 | Enterprise compare data | SP04 T7 | todo |
 | 4 | `QcMockup` | 1, SP04 T3 | todo |
 | 5 | `enterprise.astro` assembly | 2, 3, 4, SP04 T5, SP04 T6, SP01 T4, SP03 T3 | todo |

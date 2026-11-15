@@ -16,8 +16,8 @@ Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-
 | 5 | Tab behavior and FeatureTabs | 3, 4 | done |
 | 6 | EvaluatesSection and card data | SP01 T3 | done |
 | 7 | CompareTable and learner data | SP01 T3 | done |
-| 8 | Hero and `index.astro` assembly | 5, 6, 7, SP01 T4, SP03 T3 | in-progress |
-| 9 | Learner e2e spec | 8, SP01 T7 | todo |
+| 8 | Hero and `index.astro` assembly | 5, 6, 7, SP01 T4, SP03 T3 | done |
+| 9 | Learner e2e spec | 8, SP01 T7 | done |
 
 ## Task 1 — MITI formulas and reference levels
 What it is / what it means: The pure math module that keeps all mockups consistent (R3; decisions 2, 3, 4).
