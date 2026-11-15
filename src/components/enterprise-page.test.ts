@@ -25,7 +25,7 @@ describe('enterprise landing page', () => {
     expect(main.nextElementSibling?.tagName).toBe('FOOTER');
   });
 
-  it('composes the enterprise evidence tab, shared feature tabs, comparison, and section CTAs', async () => {
+  it('composes the enterprise feature tabs, comparison, and section CTAs', async () => {
     const doc = await render();
     for (const id of ['benefits', 'features', 'evaluates', 'compare']) {
       expect(doc.querySelectorAll(`#${id} [data-open-popup]`)).toHaveLength(1);
@@ -36,11 +36,11 @@ describe('enterprise landing page', () => {
     expect(heading.textContent).toBe('Features');
     expect(heading.classList.contains('visually-hidden')).toBe(true);
     const tabs = Array.from(doc.querySelectorAll('#features [role="tab"]'));
-    expect(tabs.map((tab) => tab.textContent)).toEqual(['Evidence', 'Complete', 'Feedback']);
-    expect(tabs.map((tab) => tab.id)).toEqual(['ent-evidence-tab', 'ent-complete-tab', 'ent-feedback-tab']);
-    expect(doc.querySelectorAll('#ent-evidence-panel [data-qc-row]')).toHaveLength(5);
-    expect(doc.querySelectorAll('#ent-complete-panel [data-metric]')).toHaveLength(6);
-    expect(doc.querySelectorAll('#ent-feedback-panel [data-feedback-kind]')).toHaveLength(4);
+    expect(tabs.map((tab) => tab.querySelector('.h')?.textContent)).toEqual(['See the full MITI score', "Flag scores the session doesn't support", 'Show coders where they drift']);
+    expect(tabs.map((tab) => tab.id)).toEqual(['ent-features-tab-0', 'ent-features-tab-1', 'ent-features-tab-2']);
+    expect(doc.querySelectorAll('#ent-features-panel-1 [data-qc-row]')).toHaveLength(3);
+    expect(doc.querySelectorAll('#ent-features-panel-0 [data-rating]')).toHaveLength(4);
+    expect(doc.querySelectorAll('#ent-features-panel-2 [data-suggestion]')).toHaveLength(3);
     expect(doc.querySelector('#evaluates')?.querySelectorAll('article')).toHaveLength(6);
     expect(doc.querySelector('#compare h2')?.textContent).toBe('How it compares');
     expect(Array.from(doc.querySelectorAll('#compare thead th')).map((header) => header.textContent?.trim())).toEqual(['Criterion', 'Second human coder', 'Onolys evidence check']);

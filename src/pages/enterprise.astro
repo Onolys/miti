@@ -4,13 +4,14 @@ import TeamSection from '../components/TeamSection.astro';
 import Hero from '../components/Hero.astro';
 import Section from '../components/Section.astro';
 import BenefitsSection from '../components/BenefitsSection.astro';
-import FeatureTabs from '../components/FeatureTabs.astro';
-import QcMockup from '../components/mockups/QcMockup.astro';
-import CompleteMockup from '../components/mockups/CompleteMockup.astro';
-import FeedbackMockup from '../components/mockups/FeedbackMockup.astro';
+import FeatureWidget from '../components/features/FeatureWidget.astro';
+import ScorePanel from '../components/features/ScorePanel.astro';
+import QcPanel from '../components/features/QcPanel.astro';
+import SuggestionList from '../components/features/SuggestionList.astro';
 import EvaluatesSection from '../components/EvaluatesSection.astro';
 import CompareTable from '../components/CompareTable.astro';
-import { columns, rows, highlight } from '../data/compare.enterprise';
+import { columns, rows, highlight, shortColumns, widths } from '../data/compare.enterprise';
+import { driftSuggestions, enterpriseTabs } from '../data/features';
 ---
 <Base title="Onolys for organizations" description="Evidence-linked quality control for your team's MITI coding." page="enterprise" noindex>
   <Hero
@@ -20,15 +21,15 @@ import { columns, rows, highlight } from '../data/compare.enterprise';
   <BenefitsSection />
   <Section id="features" tone="features">
     <h2 id="features-heading" class="visually-hidden">Features</h2>
-    <FeatureTabs idPrefix="ent">
-      <QcMockup slot="evidence" />
-      <CompleteMockup slot="complete" />
-      <FeedbackMockup slot="feedback" />
-    </FeatureTabs>
+    <FeatureWidget idPrefix="ent-features" tabs={enterpriseTabs}>
+      <ScorePanel slot="panel-0" />
+      <QcPanel slot="panel-1" />
+      <SuggestionList slot="panel-2" label="Across samples" items={driftSuggestions} />
+    </FeatureWidget>
   </Section>
   <EvaluatesSection />
   <Section id="compare" tone="compare" heading="How it compares">
-    <CompareTable {columns} {rows} {highlight} />
+    <CompareTable {columns} {rows} {highlight} {shortColumns} {widths} idPrefix="ent-compare" />
   </Section>
   <TeamSection />
 </Base>

@@ -14,7 +14,7 @@ export const evaluates = [
   },
   {
     headline: 'Benchmarked',
-    line: '% complex reflections, reflection-to-question ratio and technical/relational averages, each against MITI fair/good levels.',
+    line: 'Summary scores checked against MITI fair/good levels.',
   },
   {
     headline: 'Change-goal aware',

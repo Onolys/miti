@@ -2,14 +2,15 @@
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import Section from '../components/Section.astro';
-import FeatureTabs from '../components/FeatureTabs.astro';
-import EvidenceMockup from '../components/mockups/EvidenceMockup.astro';
-import CompleteMockup from '../components/mockups/CompleteMockup.astro';
-import FeedbackMockup from '../components/mockups/FeedbackMockup.astro';
+import FeatureWidget from '../components/features/FeatureWidget.astro';
+import ScorePanel from '../components/features/ScorePanel.astro';
+import EvidencePanel from '../components/features/EvidencePanel.astro';
+import SuggestionList from '../components/features/SuggestionList.astro';
 import EvaluatesSection from '../components/EvaluatesSection.astro';
 import CompareTable from '../components/CompareTable.astro';
 import TeamSection from '../components/TeamSection.astro';
-import { columns, rows, highlight } from '../data/compare.learner';
+import { columns, rows, highlight, shortColumns, widths } from '../data/compare.learner';
+import { learnerSuggestions, learnerTabs } from '../data/features';
 ---
 <Base title="Onolys — MITI evaluation with evidence for every score" description="Get your MI session evaluated against MITI 4.2.1. Every score linked to the exact transcript lines, with feedback to improve." page="learner">
   <Hero
@@ -18,20 +19,20 @@ import { columns, rows, highlight } from '../data/compare.learner';
   />
   <Section id="features" tone="features">
     <h2 id="features-heading" class="visually-hidden">Features</h2>
-    <FeatureTabs idPrefix="learner">
-      <EvidenceMockup slot="evidence" />
-      <CompleteMockup slot="complete" />
-      <FeedbackMockup slot="feedback" />
-    </FeatureTabs>
+    <FeatureWidget idPrefix="learner-features" tabs={learnerTabs}>
+      <ScorePanel slot="panel-0" />
+      <EvidencePanel slot="panel-1" />
+      <SuggestionList slot="panel-2" label="Next session" items={learnerSuggestions} />
+    </FeatureWidget>
     <p class="turnaround">Results in minutes, not the 1 to 2 weeks human coding takes.</p>
   </Section>
   <EvaluatesSection />
   <Section id="compare" tone="compare" heading="How it compares">
-    <CompareTable {columns} {rows} {highlight} />
+    <CompareTable {columns} {rows} {highlight} {shortColumns} {widths} idPrefix="learner-compare" />
   </Section>
   <TeamSection />
 </Base>
 
 <style>
-  .turnaround { margin-block: var(--space-6); color: var(--color-gray-600); }
+  .turnaround { margin-top: 1rem; text-align: center; font-size: 0.85rem; color: var(--color-gray-600); }
 </style>

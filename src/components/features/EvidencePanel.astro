@@ -1,0 +1,41 @@
+---
+import { evidenceCaption, evidenceQuotes, evidenceScores } from '../../data/features';
+---
+<div class="ev">
+  <div class="ev-l">
+    {evidenceScores.map((score) => (
+      <div class="ev-pill" style={`top:${score.top}px`} data-score-pill><span>{score.label}</span><b>{score.value}</b></div>
+    ))}
+  </div>
+  <svg class="ev-svg" viewBox="0 0 100 200" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 48 C50 48 50 22 100 22" />
+    <path d="M0 48 C50 48 50 74 100 74" />
+    <path d="M0 126 L100 126" />
+    <path d="M0 178 L100 178" />
+  </svg>
+  <div class="ev-r">
+    {evidenceQuotes.map((quote) => (
+      <div class="ev-sn" data-quote><code>{quote.line}</code><span>{quote.text}</span></div>
+    ))}
+  </div>
+</div>
+<p class="ev-cap">{evidenceCaption}</p>
+
+<style>
+  .ev { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.5fr) minmax(0, 2fr); height: 200px; }
+  .ev-l { position: relative; }
+  .ev-pill { position: absolute; left: 0; right: 0; height: 44px; background: #fff; border: 1px solid #a9cbc6; border-radius: 10px; padding: 0 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; font-size: 0.85rem; font-weight: 600; }
+  .ev-pill b { color: var(--color-accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ev-svg { width: 100%; height: 200px; display: block; }
+  .ev-svg path { fill: none; stroke: var(--color-accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; opacity: 0.75; }
+  .ev-r { display: flex; flex-direction: column; gap: 8px; }
+  .ev-sn { height: 44px; display: flex; align-items: center; gap: 0.6rem; font-size: 0.82rem; line-height: 1.3; background: #eaf5f3; border-left: 3px solid var(--color-accent); border-radius: 4px 8px 8px 4px; padding: 0 0.7rem; overflow: hidden; }
+  .ev-sn code { font: 600 0.68rem var(--font-family-sans); color: var(--color-accent); background: #fff; border-radius: 6px; padding: 0.05rem 0.4rem; flex: none; }
+  .ev-cap { margin: 0; text-align: center; font-size: 0.8rem; color: var(--color-gray-600); }
+  @container (max-width: 700px) {
+    .ev-pill { flex-direction: column; align-items: flex-start; justify-content: center; gap: 0; padding: 0 0.5rem; font-size: 0.72rem; line-height: 1.25; }
+    .ev-sn { font-size: 0.72rem; gap: 0.4rem; padding: 0 0.5rem; }
+    .ev-sn code { font-size: 0.62rem; padding: 0.05rem 0.3rem; }
+  }
+  @container (max-width: 639px) { .ev-cap { display: none; } }
+</style>

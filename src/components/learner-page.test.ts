@@ -24,7 +24,7 @@ describe('learner landing page', () => {
     expect(main.lastElementChild?.id).toBe('team');
   });
 
-  it('provides every section CTA, all three feature slots, and the exact turnaround line', async () => {
+  it('provides every section CTA, all three feature panels, and the exact turnaround line', async () => {
     const doc = await render();
     for (const id of ['features', 'evaluates', 'compare']) {
       expect(doc.querySelectorAll(`#${id} [data-open-popup]`)).toHaveLength(1);
@@ -35,10 +35,8 @@ describe('learner landing page', () => {
     expect(doc.querySelector('#features h2')?.classList.contains('visually-hidden')).toBe(true);
     expect(doc.querySelector('#features')?.textContent).toContain('Results in minutes, not the 1 to 2 weeks human coding takes.');
     const panels = Array.from(doc.querySelectorAll('#features [role="tabpanel"]'));
-    expect(panels.map((panel) => panel.id)).toEqual(['learner-evidence-panel', 'learner-complete-panel', 'learner-feedback-panel']);
-    expect(panels[0].querySelector('[data-highlight-root]')).not.toBeNull();
-    expect(panels[1].querySelectorAll('[data-metric]')).toHaveLength(6);
-    expect(panels[2].querySelectorAll('[data-feedback-kind]')).toHaveLength(4);
+    expect(panels.map((panel) => panel.id)).toEqual(['learner-features-panel-0', 'learner-features-panel-1', 'learner-features-panel-2']);
+    expect(Array.from(doc.querySelectorAll('#features [role="tab"] .h')).map((h) => h.textContent)).toEqual(['See your full MITI score', 'Know why each score was given', 'Learn what to improve next']);
     expect(doc.querySelector('#evaluates')?.querySelectorAll('article')).toHaveLength(6);
     expect(doc.querySelector('#compare h2')?.textContent).toBe('How it compares');
     expect(doc.querySelector('#compare table')).not.toBeNull();
@@ -47,7 +45,7 @@ describe('learner landing page', () => {
   it('keeps learner copy within the approved limits and links', async () => {
     const doc = await render();
     const main = doc.querySelector('main')!;
-    expect(main.textContent).not.toContain('$');
+    expect(doc.querySelector('#compare')?.textContent).toContain('$40–$80 per session');
     expect(main.querySelector('a[href="/enterprise"]')).toBeNull();
     const officialText = Array.from(doc.querySelectorAll('p')).filter((p) => /official/i.test(p.textContent ?? '')).map((p) => p.textContent);
     expect(officialText).toEqual([]);
