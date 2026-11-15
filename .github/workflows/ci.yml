@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+# Cancel the entire old PR run, including tests that could otherwise finish late
+# and deploy over a newer preview. Push runs (including main) stay independent.
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PUBLIC_SIGNUP_URL: https://script.google.com/macros/s/TEST/exec
+      PUBLIC_GA_ID: G-TEST000000
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Check Astro and TypeScript
+        run: npm run check
+      - name: Run unit tests
+        run: npm test
+      - name: Build the static site
+        run: npm run build
+      - name: Install CI Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run browser smoke tests
+        run: npm run test:e2e
+      - name: Upload failed browser report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  preview:
+    name: Deploy PR preview
+    needs: test
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    concurrency:
+      group: hosting-preview-${{ github.event.number }}
+      cancel-in-progress: true
+    env:
+      PUBLIC_SIGNUP_URL: ${{ vars.PUBLIC_SIGNUP_URL }}
+      PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
+      PUBLIC_SIGNUP_PLAN: ${{ vars.PUBLIC_SIGNUP_PLAN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Validate and build preview
+        run: npm run build:prod
+      - name: Deploy preview and update PR link
+        uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: onolys
+          target: miti
+          channelId: pr-${{ github.event.number }}
+          expires: 7d
+          firebaseToolsVersion: 15.36.0
+
+  deploy:
+    name: Deploy production Hosting
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PUBLIC_SIGNUP_URL: ${{ vars.PUBLIC_SIGNUP_URL }}
+      PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
+      PUBLIC_SIGNUP_PLAN: ${{ vars.PUBLIC_SIGNUP_PLAN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Validate and build production
+        run: npm run build:prod
+      - name: Deploy both Hosting targets
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "Missing FIREBASE_SERVICE_ACCOUNT deployment secret." >&2
+            exit 1
+          fi
+          umask 077
+          credential_file="$RUNNER_TEMP/miti-firebase-service-account.json"
+          trap 'rm -f "$credential_file"' EXIT
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$credential_file"
+          export GOOGLE_APPLICATION_CREDENTIALS="$credential_file"
+          npx firebase deploy --only hosting --project onolys --non-interactive
+      - name: Remove deployment credentials
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/miti-firebase-service-account.json"

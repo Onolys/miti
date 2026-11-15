@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Miti sign-up endpoint probe</title>
+  <style>
+    body { max-width: 48rem; margin: 3rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
+    label { display: block; margin-top: 1rem; }
+    input { display: block; box-sizing: border-box; width: 100%; padding: .6rem; }
+    button { margin-top: 1rem; padding: .6rem 1rem; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f1f3f5; padding: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Miti sign-up endpoint probe</h1>
+  <p>Use a deployed Apps Script <code>/exec</code> URL and a throwaway email you control.
+    This sends a real sign-up with <code>src: probe</code>. Click twice with the same email,
+    then check the Sheet: one row should remain and its updated time should change.</p>
+  <form>
+    <label for="endpoint">Deployed endpoint URL</label>
+    <input id="endpoint" type="url" required placeholder="https://script.google.com/macros/s/…/exec">
+    <label for="email">Throwaway email</label>
+    <input id="email" type="email" required autocomplete="off">
+    <button type="submit">Send probe</button>
+  </form>
+  <pre id="result" role="status" aria-live="polite">No probe sent.</pre>
+  <p>A readable success plus the expected Sheet row confirms Plan A for this origin.
+    A fetch error can also mean a wrong URL, deployment access, or network trouble;
+    investigate before choosing Plan B. Delete the probe rows after checking.</p>
+  <script>
+    const form = document.querySelector('form');
+    const button = form.querySelector('button');
+    const result = document.querySelector('#result');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      button.disabled = true;
+      result.textContent = 'Sending from origin: ' + location.origin;
+      try {
+        const response = await fetch(document.querySelector('#endpoint').value.trim(), {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          redirect: 'follow',
+          body: JSON.stringify({
+            step: 1,
+            email: document.querySelector('#email').value.trim(),
+            page: 'learner',
+            src: 'probe',
+            honeypot: ''
+          })
+        });
+        result.textContent += '\nHTTP status: ' + response.status + '\nResponse type: ' + response.type;
+        const body = await response.json();
+        result.textContent += '\nParsed JSON:\n' + JSON.stringify(body, null, 2);
+        result.textContent += response.ok && body && body.ok === true
+          ? '\nReadable success. Verify the Sheet row and repeat once with the same email.'
+          : '\nReadable response, but saving failed. Inspect the JSON and deployment.';
+      } catch (error) {
+        result.textContent += '\nProbe failed: ' + (error && error.message ? error.message : String(error));
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+---
+import type { CompareRow } from '../lib/compare';
+
+interface Props {
+  columns: readonly string[];
+  rows: readonly CompareRow[];
+  highlight?: number;
+  caption?: string;
+}
+const { columns, rows, highlight = columns.length - 1, caption = 'Comparison of evaluation options' } = Astro.props;
+---
+<table role="table">
+  <caption>{caption}</caption>
+  <thead role="rowgroup">
+    <tr role="row">
+      <th scope="col" role="columnheader">Criterion</th>
+      {columns.map((column, index) => (
+        <th scope="col" role="columnheader" data-highlighted={index === highlight ? 'true' : undefined}>{column}</th>
+      ))}
+    </tr>
+  </thead>
+  <tbody role="rowgroup">
+    {rows.map((row) => (
+      <tr role="row">
+        <th scope="row" role="rowheader"><h3>{row.criterion}</h3></th>
+        {columns.map((column, index) => (
+          <td role="cell" data-highlighted={index === highlight ? 'true' : undefined}>
+            <span class="column-label" data-column-label aria-hidden="true">{column}</span>
+            {index === highlight
+              ? <strong data-value>{row.values[index] ?? '—'}</strong>
+              : <span data-value>{row.values[index] ?? '—'}</span>}
+          </td>
+        ))}
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+<style>
+  table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; margin-block: var(--space-6) var(--space-8); font-size: var(--font-size-sm); }
+  caption { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  th, td { padding: var(--space-4); text-align: start; vertical-align: top; border-bottom: 1px solid var(--color-gray-300); overflow-wrap: anywhere; }
+  thead th { background: var(--color-gray-100); font-weight: 600; }
+  tbody th { font-weight: 600; }
+  h3 { margin: 0; font-size: inherit; line-height: inherit; }
+  .column-label { display: none; }
+  [data-highlighted="true"] { color: var(--color-accent); background: var(--color-score-good-background); }
+  @media (max-width: 639px) {
+    table, tbody, tr, th, td { display: block; min-width: 0; }
+    thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    tbody { display: grid; gap: var(--space-4); }
+    tbody tr { border: 1px solid var(--color-gray-300); border-radius: var(--space-2); overflow: hidden; }
+    tbody th { background: var(--color-gray-100); }
+    td { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); }
+    td:last-child { border-bottom: 0; }
+    .column-label { display: block; font-weight: 600; }
+  }
+</style>

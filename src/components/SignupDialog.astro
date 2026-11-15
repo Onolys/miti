@@ -1,0 +1,58 @@
+---
+import { signupFields } from '../data/signup-fields';
+import type { Page } from '../lib/context';
+import '../styles/signup.css';
+
+interface Props {
+  page?: Page;
+}
+const { page = 'learner' } = Astro.props;
+---
+<dialog class="signup-dialog" data-signup-dialog aria-labelledby="signup-title">
+  <div class="signup-entry" data-signup-entry>
+    <header class="signup-dialog-header">
+      <h2 id="signup-title">Get early access</h2>
+      <button class="signup-close" type="button" data-signup-close aria-label="Close">×</button>
+    </header>
+    <form class="signup-dialog-form" data-signup-form novalidate aria-busy="false">
+      <div class="signup-dialog-body">
+        <p class="signup-intro">Tell us a bit about you. Everything except email is optional.</p>
+        <div class="signup-field">
+          <label for="signup-email">Email</label>
+          <input id="signup-email" class="signup-input" name="email" type="email" autocomplete="email" inputmode="email" required aria-invalid="false" aria-describedby="signup-email-error" />
+          <p id="signup-email-error" class="signup-error" data-email-error aria-live="polite"></p>
+        </div>
+        {signupFields[page].map((field) => (
+          <div class="signup-field">
+            <label for={`signup-${field.key}`}>{field.label}</label>
+            {field.type === 'select' ? (
+              <select id={`signup-${field.key}`} class="signup-input" name={field.key} data-signup-field>
+                <option value="">Select…</option>
+                {field.options.map((option) => <option value={option}>{option}</option>)}
+              </select>
+            ) : field.type === 'textarea' ? (
+              <textarea id={`signup-${field.key}`} class="signup-input" name={field.key} data-signup-field rows="4"></textarea>
+            ) : (
+              <input id={`signup-${field.key}`} class="signup-input" name={field.key} type="text" data-signup-field />
+            )}
+          </div>
+        ))}
+        <div class="signup-honeypot" aria-hidden="true" inert>
+          <input type="text" name="company_website" tabindex="-1" autocomplete="off" />
+        </div>
+        <p class="signup-error" data-signup-error role="alert" hidden>Something went wrong. Try again, or email <a href="mailto:tejitpabari99@gmail.com">tejitpabari99@gmail.com</a>.</p>
+      </div>
+      <div class="signup-dialog-footer">
+        <button class="signup-submit" type="submit">Get early access</button>
+      </div>
+    </form>
+  </div>
+  <div class="signup-success" data-signup-success hidden>
+    <h2 id="signup-success-title" tabindex="-1">Thank you for signing up.</h2>
+    <button class="signup-submit" type="button" data-signup-close>Close</button>
+  </div>
+</dialog>
+<script>
+  import { initSignupDialog } from '../lib/signup/dialog';
+  initSignupDialog();
+</script>

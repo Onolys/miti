@@ -1,0 +1,48 @@
+---
+import { roleplay as defaultRoleplay } from '../../data/roleplay';
+import { CODE_LABELS, summarize, type Roleplay, type Summary } from '../../lib/miti';
+
+interface Props { roleplay?: Roleplay; summary?: Summary }
+const { roleplay = defaultRoleplay, summary = summarize(roleplay) } = Astro.props;
+const groups = [
+  { kind: 'strength', label: 'Strengths' },
+  { kind: 'next', label: 'Next time' },
+] as const;
+---
+<div class="feedback-mockup">
+  <div class="mockup-heading"><strong>Feedback</strong><span>Fictional learning exercise</span></div>
+  <p class="scenario">{roleplay.title}</p>
+  <div class="feedback-groups">
+    {groups.map((group) => (
+      <div class="feedback-group">
+        <h3>{group.label}</h3>
+        <ul>
+          {roleplay.feedback.filter((item) => item.kind === group.kind).map((item) => (
+            <li data-feedback-kind={item.kind}>
+              <p>{item.text}</p>
+              {item.citesCode && <span class="code-label" data-feedback-code={item.citesCode}>{CODE_LABELS[item.citesCode]} ({summary.counts[item.citesCode]})</span>}
+              <p class="citations" data-citations>{item.cites.length === 1 ? 'Line' : 'Lines'} {item.cites.join(', ')}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .feedback-mockup { min-width: 0; padding: var(--space-4); border: 1px solid var(--color-gray-300); border-radius: var(--space-3); background: var(--color-gray-50); }
+  .mockup-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+  .mockup-heading strong { font-size: var(--font-size-lg); }
+  .mockup-heading > span, .scenario { font-size: var(--font-size-xs); color: var(--color-gray-600); }
+  .scenario { margin: var(--space-2) 0 var(--space-6); }
+  .feedback-groups { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
+  h3 { margin: 0 0 var(--space-3); font-size: var(--font-size-sm); }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-3); }
+  li { min-width: 0; padding: var(--space-3); border: 1px solid var(--color-gray-300); border-inline-start: 3px solid var(--color-accent); border-radius: var(--space-2); background: var(--color-background); overflow-wrap: anywhere; }
+  li[data-feedback-kind="next"] { border-inline-start-color: var(--color-score-fair); }
+  li > p:first-child { margin: 0 0 var(--space-3); font-size: var(--font-size-sm); }
+  .code-label { font-size: var(--font-size-xs); font-weight: 600; }
+  .citations { margin: var(--space-2) 0 0; font-size: var(--font-size-xs); color: var(--color-gray-600); }
+  @media (min-width: 64rem) { .feedback-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>

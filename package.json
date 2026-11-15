@@ -1,0 +1,37 @@
+{
+  "name": "miti",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.23.4",
+    "npm": ">=9.6.5"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:hosting": "npm run build && firebase emulators:exec --only hosting \"node scripts/verify-hosting.mjs\"",
+    "build:prod": "node scripts/check-env.mjs && astro build",
+    "deploy": "npm run build:prod && firebase deploy --only hosting",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "5.3.0",
+    "astro": "7.4.12"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "@playwright/test": "1.65.1",
+    "@types/jsdom": "30.0.0",
+    "@types/node": "22.20.5",
+    "firebase-tools": "15.36.0",
+    "jsdom": "31.0.1",
+    "typescript": "6.0.3",
+    "vite": "8.3.8",
+    "vitest": "5.1.0",
+    "yaml": "2.9.1"
+  }
+}

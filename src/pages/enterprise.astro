@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import TeamSection from '../components/TeamSection.astro';
+import HeroForm from '../components/HeroForm.astro';
+import Section from '../components/Section.astro';
+import BenefitsSection from '../components/BenefitsSection.astro';
+import FeatureTabs from '../components/FeatureTabs.astro';
+import QcMockup from '../components/mockups/QcMockup.astro';
+import CompleteMockup from '../components/mockups/CompleteMockup.astro';
+import FeedbackMockup from '../components/mockups/FeedbackMockup.astro';
+import EvaluatesSection from '../components/EvaluatesSection.astro';
+import CompareTable from '../components/CompareTable.astro';
+import { columns, rows, highlight } from '../data/compare.enterprise';
+---
+<Base title="Onolys for organizations" description="Evidence-linked quality control for your team's MITI coding." page="enterprise" noindex>
+  <Section id="hero" cta={false}>
+    <div class="hero-content">
+      <h1>Quality-check your MITI coding. Every score, backed by the session.</h1>
+      <p class="hero-description">We read each coded sample against its transcript and flag the scores the session doesn't support, with line references.</p>
+      <div class="hero-form"><HeroForm /></div>
+      <p class="hero-limits">Role-play or de-identified transcripts. For practice and preparation, not official MITI coding.</p>
+    </div>
+  </Section>
+  <BenefitsSection />
+  <Section id="features">
+    <h2 id="features-heading" class="visually-hidden">Features</h2>
+    <FeatureTabs idPrefix="ent">
+      <QcMockup slot="evidence" />
+      <CompleteMockup slot="complete" />
+      <FeedbackMockup slot="feedback" />
+    </FeatureTabs>
+  </Section>
+  <EvaluatesSection />
+  <Section id="compare" heading="How it compares">
+    <CompareTable {columns} {rows} {highlight} />
+  </Section>
+  <TeamSection />
+</Base>
+
+<style>
+  .hero-content { max-width: 52rem; padding-block: var(--space-8); }
+  h1 { margin: 0; max-width: 23ch; font-size: clamp(2rem, 5vw, var(--font-size-3xl)); line-height: var(--line-height-heading); letter-spacing: -0.025em; }
+  .hero-description { max-width: 44rem; margin-block: var(--space-6); color: var(--color-gray-600); font-size: var(--font-size-lg); }
+  .hero-form { max-width: 35rem; margin-block: var(--space-8) var(--space-4); }
+  .hero-limits { max-width: 40rem; margin: 0; color: var(--color-gray-600); font-size: var(--font-size-xs); }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+</style>

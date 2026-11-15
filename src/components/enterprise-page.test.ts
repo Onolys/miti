@@ -1,0 +1,56 @@
+import { experimental_AstroContainer as AstroContainer } from 'astro/container';
+import { JSDOM } from 'jsdom';
+import { describe, expect, it } from 'vitest';
+import Enterprise from '../pages/enterprise.astro';
+
+async function render() {
+  const container = await AstroContainer.create();
+  return new JSDOM(await container.renderToString(Enterprise)).window.document;
+}
+
+describe('enterprise landing page', () => {
+  it('assembles six sections with one exact hero headline and the shared disclaimer', async () => {
+    const doc = await render();
+    const main = doc.querySelector('main')!;
+    expect(Array.from(main.querySelectorAll(':scope > section')).map(({ id }) => id)).toEqual(['hero', 'benefits', 'features', 'evaluates', 'compare', 'team']);
+    expect(doc.querySelectorAll('h1')).toHaveLength(1);
+    expect(doc.querySelector('h1')?.textContent).toBe('Quality-check your MITI coding. Every score, backed by the session.');
+    expect(doc.querySelector('#hero')?.textContent).toContain("We read each coded sample against its transcript and flag the scores the session doesn't support, with line references.");
+    expect(doc.querySelector('#hero')?.textContent).toContain('Role-play or de-identified transcripts. For practice and preparation, not official MITI coding.');
+    expect(doc.querySelectorAll('[data-hero-signup]')).toHaveLength(1);
+    expect(doc.querySelector('#hero [data-hero-signup]')).not.toBeNull();
+    expect(doc.querySelector('#hero [data-open-popup]')).toBeNull();
+    expect(main.lastElementChild?.id).toBe('team');
+    expect(main.nextElementSibling?.tagName).toBe('FOOTER');
+  });
+
+  it('composes the enterprise evidence tab, shared feature tabs, comparison, and section CTAs', async () => {
+    const doc = await render();
+    for (const id of ['benefits', 'features', 'evaluates', 'compare']) {
+      expect(doc.querySelectorAll(`#${id} [data-open-popup]`)).toHaveLength(1);
+      expect(doc.querySelector(`#${id} > [data-open-popup]`)?.getAttribute('data-trigger')).toBe(`section:${id}`);
+    }
+    expect(doc.querySelector('#benefits')?.querySelectorAll('article')).toHaveLength(3);
+    const heading = doc.querySelector('#features h2')!;
+    expect(heading.textContent).toBe('Features');
+    expect(heading.classList.contains('visually-hidden')).toBe(true);
+    const tabs = Array.from(doc.querySelectorAll('#features [role="tab"]'));
+    expect(tabs.map((tab) => tab.textContent)).toEqual(['Evidence', 'Complete', 'Feedback']);
+    expect(tabs.map((tab) => tab.id)).toEqual(['ent-evidence-tab', 'ent-complete-tab', 'ent-feedback-tab']);
+    expect(doc.querySelectorAll('#ent-evidence-panel [data-qc-row]')).toHaveLength(5);
+    expect(doc.querySelectorAll('#ent-complete-panel [data-metric]')).toHaveLength(6);
+    expect(doc.querySelectorAll('#ent-feedback-panel [data-feedback-kind]')).toHaveLength(4);
+    expect(doc.querySelector('#evaluates')?.querySelectorAll('article')).toHaveLength(6);
+    expect(doc.querySelector('#compare h2')?.textContent).toBe('How it compares');
+    expect(Array.from(doc.querySelectorAll('#compare thead th')).map((header) => header.textContent?.trim())).toEqual(['Criterion', 'Second human coder', 'Onolys evidence check']);
+  });
+
+  it('keeps enterprise main copy within the approved limits', async () => {
+    const doc = await render();
+    const main = doc.querySelector('main')!;
+    expect(main.textContent).not.toMatch(/\$|accura|replace/i);
+    expect(main.textContent).not.toContain('Results in minutes, not the 1 to 2 weeks human coding takes.');
+    expect(doc.body.dataset.page).toBe('enterprise');
+    expect(doc.querySelector('meta[name="robots"]')?.getAttribute('content')).toContain('noindex');
+  });
+});

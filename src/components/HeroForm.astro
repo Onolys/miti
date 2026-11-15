@@ -1,0 +1,38 @@
+---
+import '../styles/signup.css';
+
+interface Props {
+  id?: string;
+  label?: string;
+}
+
+const { id = 'hero-signup', label = 'Get early access' } = Astro.props;
+const emailId = `${id}-email`;
+const errorId = `${id}-error`;
+---
+<form {id} class="hero-signup" data-hero-signup novalidate aria-busy="false">
+  <div class="hero-signup-row" data-hero-row>
+    <label class="signup-visually-hidden" for={emailId}>Email</label>
+    <input
+      id={emailId}
+      class="signup-input"
+      name="email"
+      type="email"
+      autocomplete="email"
+      inputmode="email"
+      placeholder="Your email"
+      required
+      aria-invalid="false"
+      aria-describedby={errorId}
+    />
+    <button class="signup-submit" type="submit">{label}</button>
+  </div>
+  <p id={errorId} class="signup-error" data-email-error aria-live="polite"></p>
+  <div class="signup-honeypot" aria-hidden="true" inert>
+    <input type="text" name="company_website" tabindex="-1" autocomplete="off" />
+  </div>
+</form>
+<script>
+  import { initHeroForms } from '../lib/signup/hero';
+  initHeroForms();
+</script>

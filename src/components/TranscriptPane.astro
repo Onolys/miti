@@ -1,0 +1,60 @@
+---
+import { roleplay as defaultRoleplay } from '../data/roleplay';
+import { CODE_LABELS, type Roleplay } from '../lib/miti';
+
+interface Props {
+  roleplay?: Roleplay;
+  label?: string;
+  highlightedLines?: number[];
+  missedLines?: number[];
+}
+
+const {
+  roleplay = defaultRoleplay,
+  label = 'Fictional role-play transcript',
+  highlightedLines = [],
+  missedLines = [],
+} = Astro.props;
+---
+<div class="transcript-pane" data-transcript-pane role="region" aria-label={label} tabindex="0">
+  <ol>
+    {roleplay.lines.map((line) => (
+      <li data-line={line.n} data-highlighted={highlightedLines.includes(line.n) ? 'true' : undefined} data-missed={missedLines.includes(line.n) ? 'true' : undefined}>
+        <span class="line-number" aria-label={`Line ${line.n}`}>{line.n}</span>
+        <div class="line-content">
+          <span class="speaker">{line.speaker === 'counselor' ? 'Counselor' : 'Client'}</span>
+          <p>{line.text}</p>
+          <span class="line-tag" data-line-tag hidden={!highlightedLines.includes(line.n)}>{line.code ? CODE_LABELS[line.code] : 'Evidence'}</span>
+          <span class="missed-tag" data-missed-tag hidden={!missedLines.includes(line.n)}>not picked up</span>
+        </div>
+      </li>
+    ))}
+  </ol>
+</div>
+
+<style>
+  .transcript-pane {
+    min-width: 0;
+    max-height: 45vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--space-2);
+    background: var(--color-background);
+  }
+  .transcript-pane:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+  ol { list-style: none; padding: var(--space-2); margin: 0; }
+  li { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: var(--space-2); padding: var(--space-3) var(--space-2); border-inline-start: 3px solid transparent; }
+  li + li { border-top: 1px solid var(--color-gray-100); }
+  li[data-highlighted="true"] { background: var(--color-score-good-background); border-inline-start-color: var(--color-accent); }
+  li[data-missed="true"] { background: var(--color-score-fair-background); border-inline-start: 3px dashed var(--color-score-fair); }
+  .line-number { color: var(--color-gray-600); font-variant-numeric: tabular-nums; font-size: var(--font-size-xs); padding-top: 0.15rem; }
+  .speaker { font-weight: 600; font-size: var(--font-size-xs); }
+  .line-content { min-width: 0; overflow-wrap: anywhere; }
+  p { margin: var(--space-1) 0; font-size: var(--font-size-sm); }
+  .line-tag, .missed-tag { display: inline-block; padding: var(--space-1) var(--space-2); border-radius: var(--space-1); font-size: var(--font-size-xs); font-weight: 600; }
+  .line-tag { color: var(--color-score-good); background: var(--color-score-good-background); border: 1px solid currentColor; }
+  .missed-tag { color: var(--color-score-fair); background: var(--color-score-fair-background); border: 1px dashed currentColor; }
+  [hidden] { display: none; }
+</style>

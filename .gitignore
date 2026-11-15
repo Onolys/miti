@@ -1,0 +1,13 @@
+.worktrees/
+**/_next-context_.md
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+.firebase/
+firebase-debug*.log
+ui-debug.log
+playwright-report/
+test-results/
