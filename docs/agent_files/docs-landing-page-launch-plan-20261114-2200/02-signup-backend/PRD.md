@@ -95,9 +95,13 @@ Code sharing: one file, `Code.gs`, with pure functions on top and `doPost`/`doGe
 
 **Early probe** (owner-dependent, needs the URL): `apps-script/probe.html`, served from the local Astro dev origin (`http://localhost:4321`, or any local static server), does the Plan A fetch with `src:"probe"` and a throwaway email, and prints status, response type and parsed body. Pass means a readable `{ok:true}`, a new Sheet row, and a repeat click updating that row instead of adding one. If unreadable, switch SP03 to Plan B. `curl -L -X POST -H 'Content-Type: text/plain' -d '...' URL` checks the script but not CORS.
 
+### Owner deployment evidence — 2026-11-15
+
+The owner reports the Sheet, editor setup/authorization and Apps Script deployment completed, and supplied `https://script.google.com/macros/s/AKfycbyxcPSPdCvgwXYV9fhEIaEMqWE9_2ZxT_gZyJeykddALa4r_7jMv6jbs1HSNLi6HNKfyQ/exec`. An independent preliminary GET returned HTTP 200 with the expected health JSON. SP02 Task 6 verification is now in-progress. Browser response readability from local and production origins, repeated Sheet-row updates, injection/apostrophe display and probe-row cleanup remain unverified; Plan A/B acceptance is still pending. Health alone does not establish Sheet writes or CORS behavior.
+
 ## Risks / Open Questions
 - [RESOLVED: runtime correction, 2026-11-15] Google documents that bound-script active-container methods are unavailable in web apps. Use editor setup plus ScriptProperties/openById as specified above; no new product decision. [Official special-methods documentation](https://developers.google.com/apps-script/guides/bound#special_methods).
-- [DEFERRED: verify at implementation] Is the Plan A response readable from localhost and from `miti.onolys.com`? Probe on both origins (localhost early, production after deploy). — needs owner's deployed URL
+- [DEFERRED: verify at implementation] Is the Plan A response readable from localhost and from `miti.onolys.com`? Probe on both origins (localhost early, production after deploy). — URL supplied 2026-11-15; live verification in-progress
 - [RESOLVED: personal Gmail account (tejitpabari99@gmail.com) owns the Sheet and script] Which Google account hosts the script? A Workspace account can block "Anyone" access; use a personal account if so.
 - [RESOLVED: official consumer-account quotas checked 2026-11-15; see Quotas and spam above] Current Apps Script quotas for that account type. Live deployment and capacity remain unverified.
 - [DEFERRED: verify at implementation] Does the apostrophe show visibly in a plain-text-formatted cell? Verify on the first injection test row; if ugly, drop to format-only or prefix-only.

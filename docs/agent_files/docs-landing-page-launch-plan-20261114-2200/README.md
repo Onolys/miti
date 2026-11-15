@@ -10,7 +10,7 @@ date: 2026-11-15
 
 ## Current progress
 
-SP01 Tasks 1–9 implemented; CI and three-persona review passed. SP02 implementation review passed, with Task 6 blocked on owner deployment verification. SP03 Tasks 1–3 done, Task 4 in-progress; independent SP04 Task 1 in-progress; SP05 todo. Production deployment and live acceptance remain outstanding. See each TASKS.md for the resume state.
+SP01 Tasks 1–9 implemented; CI and three-persona review passed. SP02 implementation review passed; Task 6 verification is in-progress now that the owner supplied the deployed endpoint. SP03 Tasks 1–4 done, Task 5 in-progress; independent SP04 Task 1 done, Task 2 in-progress; SP05 todo. The owner reports Namecheap, Firebase, GitHub, Sheet/Apps Script and GA4 setup completed. Endpoint health, GitHub configuration names/variable values, and DNS A records have preliminary independent verification; browser CORS/Sheet behavior, valid custom-domain HTTPS and production acceptance remain outstanding. See each TASKS.md for the resume state.
 
 ## Sub-projects
 

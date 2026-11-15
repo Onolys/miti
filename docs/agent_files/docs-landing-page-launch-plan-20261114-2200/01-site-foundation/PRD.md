@@ -113,6 +113,10 @@ track(event: string, params?: Record<string, unknown>): void // adds page+src
 - Supply the real `PUBLIC_SIGNUP_URL` (from SP02's Apps Script deploy) and `PUBLIC_GA_ID`.
 - If Drive access is unavailable to the agent: place the 3 team photos in `src/assets/team/`.
 
+### Owner configuration evidence — 2026-11-15
+
+The owner reports Namecheap, Firebase, GitHub, Sheet/Apps Script and GA4 setup completed. Supplied public configuration: `PUBLIC_SIGNUP_URL=https://script.google.com/macros/s/AKfycbyxcPSPdCvgwXYV9fhEIaEMqWE9_2ZxT_gZyJeykddALa4r_7jMv6jbs1HSNLi6HNKfyQ/exec`, `PUBLIC_GA_ID=G-BDWQM4BQLM`. Preliminary independent checks confirmed the expected GitHub secret name and matching public repo variables, and A records resolving to `199.36.158.100` for `miti.onolys.com`, `onolys.com` and `www.onolys.com`. This does not verify secret contents or a successful deploy. Custom-domain HTTPS currently fails certificate validation; live checks are ongoing. Production deployment, redirects and GA event delivery are not yet accepted. These are implementation evidence notes; the approved manual steps and acceptance requirements remain unchanged.
+
 ## Risks / Open Questions
 - [RESOLVED: implementer downloads tejit.jpg, git.jpg, fred.jpg from the Drive folder via the Google Drive connector (file IDs in brief); if access fails, ask owner for files; initials placeholders meanwhile] Agent access to the Drive folder (MCP download by file ID) is unverified; folder may be private.
 - [RESOLVED: nothing to keep on onolys.com or www; point both at the redirect site; never touch MX records] Does `onolys.com` currently host a site or have A/CNAME records (and `www`) that must be replaced? MX/email records must not be touched.
