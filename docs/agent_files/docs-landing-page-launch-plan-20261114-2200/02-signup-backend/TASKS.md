@@ -11,7 +11,7 @@ Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-
 | 1 | Test harness (vm + mocks) | SP01 T-Vitest (test runner) | done |
 | 2 | Validation and sanitizing | 1 | done |
 | 3 | Sheet header, upsert, formula guard | 2 | done |
-| 4 | doPost / doGet, lock, error mapping | 3 | in-progress |
+| 4 | doPost / doGet, lock, error mapping | 3 | done |
 | 5 | README and probe page | 4 | done |
 | 6 | Deploy, probe, quota check, handoff | 5, owner steps | blocked |
 
