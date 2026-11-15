@@ -116,7 +116,7 @@ Same as `/`, with these differences:
 New Firebase project with Hosting, and GA4 linked. Both `miti.onolys.com` and `onolys.com` are connected; `onolys.com` redirects to `miti.onolys.com`. DNS records are added at Namecheap. Deploy with `firebase deploy` from the Astro build output.
 
 ### Owner-only (Tejit)
-- Create the Google Sheet, paste the script, deploy it as a web app (Execute as: Me, Access: Anyone), and send the URL.
+- Create the Google Sheet, paste the script, run `setupSignup()` once in the bound script editor and authorize access, then deploy it as a web app (Execute as: Me, Access: Anyone), and send the URL.
 - Create the Firebase project, enable GA4, and send the measurement ID. Give deploy access or run the deploy.
 - Add the Firebase DNS records for both domains at Namecheap.
 

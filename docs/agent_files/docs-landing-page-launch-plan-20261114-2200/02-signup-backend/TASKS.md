@@ -11,7 +11,7 @@ Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-
 | 1 | Test harness (vm + mocks) | SP01 T-Vitest (test runner) | done |
 | 2 | Validation and sanitizing | 1 | done |
 | 3 | Sheet header, upsert, formula guard | 2 | done |
-| 4 | doPost / doGet, lock, error mapping | 3 | done |
+| 4 | doPost / doGet, lock, error mapping | 3 | in-progress |
 | 5 | README and probe page | 4 | done |
 | 6 | Deploy, probe, quota check, handoff | 5, owner steps | blocked |
 
@@ -32,13 +32,13 @@ Done when: tests cover step 1 creates a row; step 2 updates the same row (no sec
 
 ## Task 4 — doPost / doGet, lock, error mapping
 What it is / what it means: The public entry points that tie validation and upsert to the frozen response contract SP03 codes against (Decisions 5, 7).
-What changes at a high level: `doPost` wraps everything in try/catch: parse and validate, honeypot returns `{ok:true}` before any lock or write, `getScriptLock().waitLock(10000)`, ensureHeader, upsert, flush, release in `finally`; always HTTP 200 JSON via `ContentService`. Map errors to `bad_request`, `invalid_email`, `too_large`, `busy` (lock timeout), `server` (any throw). `doGet` returns `{"ok":true,"service":"miti-signup"}`. No secrets, no hardcoded Sheet ID; container-bound via `getActiveSpreadsheet`, tab `signups` auto-created.
-Done when: tests cover saved reply `{ok:true}`; honeypot returns `ok:true`, writes nothing and never touches the lock; each error code; lock acquired and released in `finally` even when the write throws; `waitLock` throwing gives `busy`; a thrown error gives `server` as valid JSON; `doGet` JSON; `signups` tab auto-created.
+What changes at a high level: `doPost` wraps everything in try/catch: parse and validate, honeypot returns `{ok:true}` before any lock or write, `getScriptLock().waitLock(10000)`, ensureHeader, upsert, flush, release in `finally`; always HTTP 200 JSON via `ContentService`. Map errors to `bad_request`, `invalid_email`, `too_large`, `busy` (lock timeout), `server` (any throw). `doGet` returns `{"ok":true,"service":"miti-signup"}`. No secrets, no hardcoded Sheet ID; editor-run `setupSignup()` validates a bound active spreadsheet and stores its ID as ScriptProperties `SIGNUP_SPREADSHEET_ID`. HTTP reads that property and opens with `SpreadsheetApp.openById`, never active context; missing configuration returns the existing `server` JSON. Tab `signups` is auto-created; health-check JSON is unchanged.
+Done when: tests cover saved reply `{ok:true}`; honeypot returns `ok:true`, writes nothing and never touches the lock; each error code; lock acquired and released in `finally` even when the write throws; `waitLock` throwing gives `busy`; a thrown error gives `server` as valid JSON; `doGet` JSON; `signups` tab auto-created; setup captures the bound ID and rejects missing active spreadsheet; HTTP succeeds with no active context using stored ID/openById and returns `server` JSON when the ID is absent.
 
 ## Task 5 — README and probe page
 What it is / what it means: Owner-facing instructions and the early cross-origin probe that settles Plan A vs Plan B.
-What changes at a high level: Write `apps-script/README.md` covering paste, web-app deploy (Execute as Me, Anyone), the `/exec` check, the redeploy gotcha (Manage deployments, New version, keeps URL), the `curl -L` check (script only, not CORS), daily Sheet check in week 1, and the contract summary. Add `apps-script/probe.html`: a static page doing the Plan A fetch with `src:"probe"` and a throwaway email, printing status, response type and parsed body, runnable from `http://localhost:4321` or any local static server.
-Done when: README contains every step above, verified by reading it against the PRD Manual steps; `probe.html` loads locally, shows its output for a failing URL (sanity check), and sends the exact Plan A request shape (`text/plain`, no extra headers).
+What changes at a high level: Write `apps-script/README.md` covering paste, one authorized editor run of `setupSignup()` before deployment (validates the bound spreadsheet and stores its ID), web-app deploy (Execute as Me, Anyone), the `/exec` check, the redeploy gotcha (Manage deployments, New version, keeps URL), the `curl -L` check (script only, not CORS), daily Sheet check in week 1, and the contract summary. Add `apps-script/probe.html`: a static page doing the Plan A fetch with `src:"probe"` and a throwaway email, printing status, response type and parsed body, runnable from `http://localhost:4321` or any local static server.
+Done when: README contains every step above including editor setup before deploy, verified by reading it against the PRD Manual steps; `probe.html` loads locally, shows its output for a failing URL (sanity check), and sends the exact Plan A request shape (`text/plain`, no extra headers).
 
 ## Task 6 — Deploy, probe, quota check, handoff
 What it is / what it means: Verification against the real deployment, closing every [DEFERRED] item with evidence, no invented answers. Blocked until the owner supplies the URL.
@@ -46,7 +46,7 @@ What changes at a high level: After the owner deploys (personal Gmail account, w
 Done when: Plan A/B outcome, apostrophe result and quota numbers are recorded in the PRD; SP03 has the outcome; probe rows removed; any apostrophe change is covered by updated Task 3 tests passing in CI.
 
 ## Owner steps
-- Create the Sheet in the personal Gmail account, paste `Code.gs` via Extensions, Apps Script, deploy as web app (Execute as: Me, Access: Anyone), authorize the Sheet scope.
+- Create the Sheet in the personal Gmail account, paste `Code.gs` via Extensions, Apps Script, run `setupSignup()` once from the editor and authorize access to capture the bound spreadsheet ID, then deploy as web app (Execute as: Me, Access: Anyone), authorize the Sheet scope.
 - Visit the `/exec` URL, confirm the `doGet` JSON, send the URL (becomes `PUBLIC_SIGNUP_URL`).
 - Run or witness the probe, then delete probe rows.
 - After any code change: Manage deployments, edit existing, New version, Deploy (never "New deployment").

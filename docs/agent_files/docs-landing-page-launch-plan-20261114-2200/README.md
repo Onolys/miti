@@ -66,7 +66,7 @@ Deferred to implementation (verify then): Chromium path, teal hex contrast, Plan
 
 ## Owner-only manual steps
 
-- Create the Google Sheet, paste the script, deploy as web app (Execute as: Me, Access: Anyone), send the URL.
+- Create the Google Sheet, paste the script, run `setupSignup()` once in the bound script editor and authorize access, then deploy as web app (Execute as: Me, Access: Anyone), send the URL.
 - Create the Firebase project, enable GA4, send the measurement ID (implementer may create the project if CLI auth exists); add the Firebase service-account secret and PUBLIC_* repo variables in GitHub.
 - Add the Firebase DNS records for both domains at Namecheap.
 - Have one MI trainer/coder review the mockups (esp. the QC mockup) (wording items already approved).
