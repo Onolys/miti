@@ -58,6 +58,62 @@ function utf8ByteLength(value) {
   return bytes;
 }
 
+var SIGNUP_COLUMNS = ['first_seen', 'updated', 'page', 'src', 'email', 'role',
+  'how_often', 'feedback_today', 'pay', 'anything_else', 'organization',
+  'org_type', 'team_size', 'samples_per_month'];
+
+function ensureHeader(sheet) {
+  var width = sheet.getLastColumn();
+  var headers = width ? sheet.getRange(1, 1, 1, width).getValues()[0] : [];
+  var missing = SIGNUP_COLUMNS.filter(function (name) { return headers.indexOf(name) === -1; });
+  if (missing.length) {
+    sheet.getRange(1, headers.length + 1, 1, missing.length).setValues([missing]);
+    headers = headers.concat(missing);
+  }
+  sheet.getRange(1, 1, sheet.getMaxRows(), headers.length).setNumberFormat('@');
+  return headers;
+}
+
+// Caller holds the script lock. Optional headers avoid repeating ensureHeader in doPost.
+function upsert(sheet, record, now, headers) {
+  headers = headers || ensureHeader(sheet);
+  var timestamp = new Date(now).toISOString();
+  var count = sheet.getLastRow() - 1;
+  var matchedRow = 0;
+  if (count > 0) {
+    var emails = sheet.getRange(2, headers.indexOf('email') + 1, count, 1).getValues();
+    var pages = sheet.getRange(2, headers.indexOf('page') + 1, count, 1).getValues();
+    for (var index = 0; index < count; index++) {
+      if (String(emails[index][0]).trim().toLowerCase() === record.email &&
+          pages[index][0] === record.page) {
+        matchedRow = index + 2;
+        break;
+      }
+    }
+  }
+  if (!matchedRow) {
+    sheet.appendRow(headers.map(function (name) {
+      if (name === 'first_seen' || name === 'updated') return timestamp;
+      if (SIGNUP_COLUMNS.indexOf(name) === -1 || record[name] == null) return '';
+      return name === 'email' ? record[name] : formulaSafe(record[name]);
+    }));
+    return;
+  }
+
+  sheet.getRange(matchedRow, headers.indexOf('updated') + 1).setValue(timestamp);
+  SIGNUP_COLUMNS.forEach(function (name) {
+    if (name === 'first_seen' || name === 'updated' ||
+        record[name] == null || record[name] === '') return;
+    var cell = sheet.getRange(matchedRow, headers.indexOf(name) + 1);
+    if (name === 'src' && cell.getValue() !== '') return;
+    cell.setValue(name === 'email' ? record[name] : formulaSafe(record[name]));
+  });
+}
+
+function formulaSafe(value) {
+  return typeof value === 'string' && /^[=+@\-\t\r]/.test(value) ? "'" + value : value;
+}
+
 function doGet() {
   return ContentService.createTextOutput(JSON.stringify({ ok: true, service: 'miti-signup' }))
     .setMimeType(ContentService.MimeType.JSON);
