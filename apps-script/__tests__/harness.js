@@ -4,7 +4,10 @@ import vm from 'node:vm';
 // Execute the same unmodified source that the owner pastes into Apps Script.
 const codePath = new URL('../Code.gs', import.meta.url);
 
-export function createAppsScriptHarness({ rows = [], sheetExists = true, waitLockError } = {}) {
+export function createAppsScriptHarness({
+  rows = [], sheetExists = true, waitLockError,
+  activeSpreadsheet = false, configured = true, spreadsheetId = 'test-spreadsheet-id',
+} = {}) {
   const cells = rows.map((row) => [...row]);
   const events = [];
   const outputs = [];
@@ -69,6 +72,7 @@ export function createAppsScriptHarness({ rows = [], sheetExists = true, waitLoc
     },
   };
   const spreadsheet = {
+    getId: () => spreadsheetId,
     getSheetByName(name) {
       return name === 'signups' && existingSheet ? sheet : null;
     },
@@ -79,11 +83,29 @@ export function createAppsScriptHarness({ rows = [], sheetExists = true, waitLoc
     },
   };
   const SpreadsheetApp = {
-    getActiveSpreadsheet: () => spreadsheet,
+    // Web apps have no active container; opt in only for editor setup tests.
+    getActiveSpreadsheet: () => activeSpreadsheet ? spreadsheet : null,
+    openById(id) {
+      if (id !== spreadsheetId) throw new Error('Spreadsheet not found or access denied');
+      return spreadsheet;
+    },
     flush() {
       events.push('flush');
     },
   };
+  const properties = new Map(configured ? [['SIGNUP_SPREADSHEET_ID', spreadsheetId]] : []);
+  const scriptProperties = {
+    getProperty: (key) => properties.get(key) ?? null,
+    setProperty(key, value) {
+      properties.set(key, String(value));
+      return scriptProperties;
+    },
+    deleteProperty(key) {
+      properties.delete(key);
+      return scriptProperties;
+    },
+  };
+  const PropertiesService = { getScriptProperties: () => scriptProperties };
   const lock = {
     waitLock(timeout) {
       events.push({ type: 'waitLock', timeout });
@@ -110,10 +132,10 @@ export function createAppsScriptHarness({ rows = [], sheetExists = true, waitLoc
       return output;
     },
   };
-  const context = vm.createContext({ SpreadsheetApp, LockService, ContentService });
+  const context = vm.createContext({ SpreadsheetApp, PropertiesService, LockService, ContentService });
   vm.runInContext(readFileSync(codePath, 'utf8'), context, { filename: 'Code.gs' });
 
-  return { context, sheet, spreadsheet, lock, SpreadsheetApp, LockService, ContentService, events, outputs, formats };
+  return { context, sheet, spreadsheet, lock, scriptProperties, SpreadsheetApp, PropertiesService, LockService, ContentService, events, outputs, formats };
 }
 
 function isPopulated(value) {

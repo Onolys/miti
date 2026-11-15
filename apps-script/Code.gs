@@ -114,6 +114,17 @@ function formulaSafe(value) {
   return typeof value === 'string' && /^[=+@\-\t\r]/.test(value) ? "'" + value : value;
 }
 
+// Run once from the bound script editor before deploying the web app.
+function setupSignup() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  if (!spreadsheet) throw new Error('Run setupSignup from the Sheet-bound script editor.');
+  var id = spreadsheet.getId();
+  if (typeof id !== 'string' || !id.trim()) throw new Error('The bound spreadsheet must have a valid ID.');
+  PropertiesService.getScriptProperties().setProperty('SIGNUP_SPREADSHEET_ID', id);
+  console.log('Miti signup spreadsheet configured. You can deploy the web app.');
+  return { ok: true };
+}
+
 function jsonResponse(body) {
   return ContentService.createTextOutput(JSON.stringify(body))
     .setMimeType(ContentService.MimeType.JSON);
@@ -132,7 +143,9 @@ function doPost(event) {
       return jsonResponse({ ok: false, error: 'busy' });
     }
     try {
-      var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+      var id = PropertiesService.getScriptProperties().getProperty('SIGNUP_SPREADSHEET_ID');
+      if (!id || !id.trim()) throw new Error('Run setupSignup from the Sheet-bound script editor first.');
+      var spreadsheet = SpreadsheetApp.openById(id);
       var sheet = spreadsheet.getSheetByName('signups') || spreadsheet.insertSheet('signups');
       var headers = ensureHeader(sheet);
       upsert(sheet, parsed.record, new Date().toISOString(), headers);

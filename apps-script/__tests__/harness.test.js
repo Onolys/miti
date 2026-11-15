@@ -16,7 +16,7 @@ describe('Apps Script test harness', () => {
     const harness = createAppsScriptHarness({
       rows: [['owner_note', 'email', 'page'], ['keep', 'a@b.co', 'learner']],
     });
-    const sheet = harness.SpreadsheetApp.getActiveSpreadsheet().getSheetByName('signups');
+    const sheet = harness.spreadsheet.getSheetByName('signups');
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     const emailColumn = headers.indexOf('email') + 1;
 
@@ -37,7 +37,7 @@ describe('Apps Script test harness', () => {
 
   it('creates an absent sheet and keeps empty range cells blank', () => {
     const harness = createAppsScriptHarness({ sheetExists: false });
-    const spreadsheet = harness.SpreadsheetApp.getActiveSpreadsheet();
+    const spreadsheet = harness.spreadsheet;
 
     expect(spreadsheet.getSheetByName('signups')).toBeNull();
     const sheet = spreadsheet.insertSheet('signups');

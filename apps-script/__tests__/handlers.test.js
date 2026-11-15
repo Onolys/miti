@@ -33,7 +33,7 @@ describe('Apps Script request handlers', () => {
   it.each(['bot', 0, false, { toString: null }])('silently accepts honeypot %j before touching lock or spreadsheet', (honeypot) => {
     const harness = createAppsScriptHarness();
     const lock = vi.spyOn(harness.LockService, 'getScriptLock');
-    const spreadsheet = vi.spyOn(harness.SpreadsheetApp, 'getActiveSpreadsheet');
+    const spreadsheet = vi.spyOn(harness.SpreadsheetApp, 'openById');
     expect(post(harness, JSON.stringify({ ...payload, honeypot }))).toEqual({ ok: true });
     expect(lock).not.toHaveBeenCalled();
     expect(spreadsheet).not.toHaveBeenCalled();
@@ -66,7 +66,7 @@ describe('Apps Script request handlers', () => {
 
   it('maps waitLock timeout to busy without releasing an unacquired lock', () => {
     const harness = createAppsScriptHarness({ waitLockError: new Error('timed out') });
-    const spreadsheet = vi.spyOn(harness.SpreadsheetApp, 'getActiveSpreadsheet');
+    const spreadsheet = vi.spyOn(harness.SpreadsheetApp, 'openById');
     expect(post(harness)).toEqual({ ok: false, error: 'busy' });
     expect(harness.events).toEqual([{ type: 'waitLock', timeout: 10000 }]);
     expect(spreadsheet).not.toHaveBeenCalled();
@@ -109,7 +109,7 @@ describe('Apps Script request handlers', () => {
 
   it('releases the lock when the bound spreadsheet throws', () => {
     const harness = createAppsScriptHarness();
-    vi.spyOn(harness.SpreadsheetApp, 'getActiveSpreadsheet').mockImplementation(() => { throw new Error('spreadsheet unavailable'); });
+    vi.spyOn(harness.SpreadsheetApp, 'openById').mockImplementation(() => { throw new Error('spreadsheet unavailable'); });
     expect(post(harness)).toEqual({ ok: false, error: 'server' });
     expect(harness.events).toEqual([{ type: 'waitLock', timeout: 10000 }, 'releaseLock']);
   });

@@ -1,17 +1,20 @@
 # Miti sign-up backend
 
-`Code.gs` is the complete pasteable backend. Its exact source runs in Node tests through `__tests__/harness.js`; there is no build, export wrapper, Sheet ID, or secret to configure. `probe.html` checks whether a browser can read a deployed response from a different origin.
+`Code.gs` is the complete pasteable backend. Its exact source runs in Node tests through `__tests__/harness.js`; there is no build, export wrapper, hardcoded Sheet ID, or secret. One editor-run setup captures the bound Sheet ID automatically. `probe.html` checks whether a browser can read a deployed response from a different origin.
 
 ## Deploy and connect
 
 1. Using the owner's personal Google account, create a Google Sheet. Open **Extensions → Apps Script** so the script is bound to that Sheet.
-2. Replace the default editor file with the complete contents of `Code.gs` and save. The script uses `SpreadsheetApp.getActiveSpreadsheet()` and creates the `signups` tab automatically.
-3. Select **Deploy → New deployment → Web app**. Set **Execute as: Me** and **Who has access: Anyone**. Authorize the requested Sheet access when prompted. A Workspace account may restrict anonymous access; the agreed owner is a personal Gmail account.
-4. Copy the deployed URL ending in `/exec`. Visit it and expect exactly:
+2. Replace the default editor file with the complete contents of `Code.gs` and save.
+3. Select **setupSignup** in the editor's function selector and click **Run**. Authorize access when prompted. The execution log should say **Miti signup spreadsheet configured. You can deploy the web app.** The function returns `{"ok":true}` and saves the bound Sheet's ID as `SIGNUP_SPREADSHEET_ID` in Script Properties; no ID needs copying into source. If setup reports that it must run from the Sheet-bound editor, return to **Extensions → Apps Script** in the intended Sheet and run it there. Failed setup leaves prior configuration unchanged.
+4. Select **Deploy → New deployment → Web app**. Set **Execute as: Me** and **Who has access: Anyone**. Authorize the requested Sheet access when prompted. A Workspace account may restrict anonymous access; the agreed owner is a personal Gmail account.
+5. Copy the deployed URL ending in `/exec`. Visit it and expect exactly:
    ```json
    {"ok":true,"service":"miti-signup"}
    ```
-5. Give the deployed `/exec` URL to the site maintainer to configure `PUBLIC_SIGNUP_URL`. Complete the browser probe below before deciding whether the client needs Plan B.
+6. Give the deployed `/exec` URL to the site maintainer to configure `PUBLIC_SIGNUP_URL`. Complete the browser probe below before deciding whether the client needs Plan B.
+
+Only editor setup uses `SpreadsheetApp.getActiveSpreadsheet()`. Web-app requests read the saved property and call `SpreadsheetApp.openById()` because active-container methods are unavailable in web apps. The `signups` tab is created on the first valid POST. A missing configuration or inaccessible Sheet returns `{"ok":false,"error":"server"}`. The healthcheck does not check storage configuration, so verify setup and run the POST probe too. Setup normally runs once; rerun it from the intended bound Sheet editor if you need to restore the saved configuration.
 
 Saving an editor change does **not** update the live web app. To update it, choose **Deploy → Manage deployments → edit the existing deployment → Version: New version → Deploy**. This preserves the `/exec` URL. Creating another deployment creates a different URL.
 
