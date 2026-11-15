@@ -12,11 +12,11 @@ Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-
 | 1 | QC data (`roleplay.qc.ts`) and its pinning test | SP04 T1, SP04 T2 | done |
 | 2 | Benefits data and `BenefitsSection` | SP01 T3 | done |
 | 3 | Enterprise compare data | SP04 T7 | done |
-| 4 | `QcMockup` | 1, SP04 T3 | in-progress |
-| 5 | `enterprise.astro` assembly | 2, 3, 4, SP04 T5, SP04 T6, SP01 T4, SP03 T3 | todo |
-| 6 | noindex and isolation checks | 5, SP01 T5 | todo |
-| 7 | Enterprise e2e spec | 5, 6, SP01 T7, SP03 T4 | todo |
-| 8 | Final gates and `/` regression | 7, SP01 T8 | todo |
+| 4 | `QcMockup` | 1, SP04 T3 | done |
+| 5 | `enterprise.astro` assembly | 2, 3, 4, SP04 T5, SP04 T6, SP01 T4, SP03 T3 | done |
+| 6 | noindex and isolation checks | 5, SP01 T5 | done |
+| 7 | Enterprise e2e spec | 5, 6, SP01 T7, SP03 T4 | done |
+| 8 | Final gates and `/` regression | 7, SP01 T8 | done |
 
 ## Task 1 — QC data (`roleplay.qc.ts`) and its pinning test
 What it is / what it means: The coder's invented scores plus our flags, derived from the shared role-play so flags can never contradict the transcript (R4; decisions 1-3; resolved items 1, 2, 8).
