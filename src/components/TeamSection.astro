@@ -1,1 +1,103 @@
-<!-- SP01 Task 4 supplies the shared Team section here. -->
+---
+import { Image } from 'astro:assets';
+import { partnerLine, team } from '../data/team';
+import Section from './Section.astro';
+import CtaButton from './CtaButton.astro';
+---
+<Section id="team" heading="Team" cta={false}>
+  <div class="cards">
+    {team.map((member) => (
+      <article>
+        <Image src={member.photo} alt={`Photo of ${member.name}`} width={320} height={320} format="webp" fit="cover" loading="lazy" />
+        <h3>{member.name}</h3>
+        {member.pronouns && <p class="pronouns">({member.pronouns})</p>}
+        {member.badge && <span class="badge">{member.badge}</span>}
+        <p class="bio">{member.bio}</p>
+        <a class="linkedin" href={member.linkedin} aria-label={`${member.name} on LinkedIn`} target="_blank" rel="noopener noreferrer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M20.45 2H3.55C2.69 2 2 2.68 2 3.52v16.96c0 .84.69 1.52 1.55 1.52h16.9c.86 0 1.55-.68 1.55-1.52V3.52c0-.84-.69-1.52-1.55-1.52ZM7.93 18.75H4.98V9.2h2.95v9.55ZM6.46 7.9a1.71 1.71 0 1 1 0-3.42 1.71 1.71 0 0 1 0 3.42Zm12.29 10.85H15.8V14.1c0-1.11-.02-2.54-1.55-2.54-1.55 0-1.79 1.21-1.79 2.46v4.73H9.51V9.2h2.83v1.3h.04c.39-.74 1.36-1.52 2.8-1.52 2.99 0 3.57 1.97 3.57 4.53v5.24Z" />
+          </svg>
+        </a>
+      </article>
+    ))}
+  </div>
+  <p class="partners">{partnerLine}</p>
+  <div class="actions">
+    <CtaButton trigger="team" />
+    <a href="mailto:tejitpabari99@gmail.com">Questions?</a>
+  </div>
+</Section>
+
+<style>
+  .cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-8);
+  }
+
+  article {
+    min-width: 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--space-3);
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--space-2);
+  }
+
+  h3 {
+    margin: var(--space-4) 0 var(--space-2);
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-heading);
+  }
+
+  .pronouns {
+    margin: 0 0 var(--space-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--space-1);
+    color: var(--color-on-accent);
+    background: var(--color-accent);
+    font-size: var(--font-size-xs);
+  }
+
+  a {
+    color: var(--color-accent);
+  }
+
+  .linkedin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+  }
+
+  .partners {
+    margin-block: var(--space-8);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 48rem) {
+    .cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>
