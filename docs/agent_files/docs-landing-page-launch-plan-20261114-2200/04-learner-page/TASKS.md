@@ -14,9 +14,9 @@ Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-
 | 3 | Highlight behavior, TranscriptPane, EvidenceMockup | 2, SP01 T3 | done |
 | 4 | CompleteMockup and FeedbackMockup | 2, SP01 T1 | done |
 | 5 | Tab behavior and FeatureTabs | 3, 4 | done |
-| 6 | EvaluatesSection and card data | SP01 T3 | in-progress |
-| 7 | CompareTable and learner data | SP01 T3 | todo |
-| 8 | Hero and `index.astro` assembly | 5, 6, 7, SP01 T4, SP03 T3 | todo |
+| 6 | EvaluatesSection and card data | SP01 T3 | done |
+| 7 | CompareTable and learner data | SP01 T3 | done |
+| 8 | Hero and `index.astro` assembly | 5, 6, 7, SP01 T4, SP03 T3 | in-progress |
 | 9 | Learner e2e spec | 8, SP01 T7 | todo |
 
 ## Task 1 — MITI formulas and reference levels
