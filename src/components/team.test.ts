@@ -1,7 +1,7 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { JSDOM } from 'jsdom';
 import { describe, expect, it } from 'vitest';
-import { partnerLine, team } from '../data/team';
+import { team } from '../data/team';
 import TeamSection from './TeamSection.astro';
 
 const expected = [
@@ -21,11 +21,6 @@ describe('team data', () => {
     for (const member of team) {
       expect(Object.keys(member).sort()).toEqual(['lead', 'linkedin', 'name', 'photo', 'rest']);
     }
-  });
-
-  it('structures the partner line with the three institutions bold', () => {
-    expect(partnerLine.map((part) => part.text).join('')).toBe('Backed by researchers from Harvard Medical School, Columbia Medical Center and Massachusetts General Hospital.');
-    expect(partnerLine.filter((part) => part.bold).map((part) => part.text)).toEqual(['Harvard Medical School', 'Columbia Medical Center', 'Massachusetts General Hospital']);
   });
 });
 
@@ -57,15 +52,8 @@ describe('team section', () => {
     expect(doc.querySelector('#team .pronouns')).toBeNull();
   });
 
-  it('renders the partner line centered with bold institution names, one CTA and no Questions link', async () => {
+  it('renders one CTA and no Questions link', async () => {
     const doc = await render();
-    const partners = doc.querySelector('#team .partners')!;
-    expect(partners.textContent).toBe('Backed by researchers from Harvard Medical School, Columbia Medical Center and Massachusetts General Hospital.');
-    expect(Array.from(partners.querySelectorAll('strong')).map((el) => el.textContent)).toEqual(['Harvard Medical School', 'Columbia Medical Center', 'Massachusetts General Hospital']);
-    const breaks = partners.querySelectorAll('br.desktop-break');
-    expect(breaks).toHaveLength(1);
-    expect(breaks[0].nextSibling?.textContent).toBe('and ');
-    expect(partners.querySelector('br.desktop-break')?.previousSibling?.textContent).toBe(' ');
     expect(doc.querySelectorAll('[data-open-popup]')).toHaveLength(1);
     expect(doc.querySelector('[data-open-popup]')?.getAttribute('data-trigger')).toBe('team');
     expect(doc.querySelector('#team a[href^="mailto:"]')).toBeNull();
