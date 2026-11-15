@@ -66,7 +66,7 @@ Code sharing: one file, `Code.gs`, with pure functions on top and `doPost`/`doGe
 - Plan B (only if the probe shows the response is unreadable): same call with `mode:'no-cors'`. The response is opaque, so a resolved promise means "sent, unconfirmed" and SP03 shows success. A rejected promise means failure. Safe because the upsert is idempotent.
 - SP03 mocks the endpoint with Plan A's shape; the plan switch is one function.
 
-**Quotas and spam**: expect Apps Script daily trigger/runtime and concurrent-execution limits and the Sheet 10M-cell cap to be far above launch traffic [DEFERRED: verify at implementation]. Spam shows as junk emails, since honeypot hits are silent and leave no trace. Owner checks the Sheet daily in week 1 per the brief's risk table.
+**Quotas and spam**: [Google Apps Script quotas](https://developers.google.com/apps-script/guides/services/quotas), checked 2026-11-15 for the agreed consumer account: 6 minutes per execution, 30 simultaneous executions per user, and 1,000 per script. The listed 90 minutes/day applies to trigger runtime; 20,000/day applies to outgoing URL Fetch calls. Neither is a generic inbound web-app request quota. Limits may change; launch capacity has not been load-tested. Spam shows as junk emails, since honeypot hits are silent and leave no trace. Owner checks the Sheet daily in week 1 per the brief's risk table.
 
 ## Decisions
 | # | Decision | Choice | Alternatives considered | Why |
@@ -94,7 +94,7 @@ Code sharing: one file, `Code.gs`, with pure functions on top and `doPost`/`doGe
 ## Risks / Open Questions
 - [DEFERRED: verify at implementation] Is the Plan A response readable from localhost and from `miti.onolys.com`? Probe on both origins (localhost early, production after deploy). — needs owner's deployed URL
 - [RESOLVED: personal Gmail account (tejitpabari99@gmail.com) owns the Sheet and script] Which Google account hosts the script? A Workspace account can block "Anyone" access; use a personal account if so.
-- [DEFERRED: verify at implementation] Current Apps Script quotas for that account type (see above).
+- [RESOLVED: official consumer-account quotas checked 2026-11-15; see Quotas and spam above] Current Apps Script quotas for that account type. Live deployment and capacity remain unverified.
 - [DEFERRED: verify at implementation] Does the apostrophe show visibly in a plain-text-formatted cell? Verify on the first injection test row; if ugly, drop to format-only or prefix-only.
 - [RESOLVED: lock + non-blank-only update makes order irrelevant] Hero submit and popup submit can overlap; the lock covers the race. Fire-and-forget by SP03 is acceptable, but request ordering is not guaranteed, and since the update is non-blank-only the final row is correct either way.
 - [RESOLVED: lock timeout returns `busy`, client may retry once, upsert is idempotent]

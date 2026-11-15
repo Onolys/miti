@@ -9,11 +9,11 @@ Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Project scaffold, tokens, Vitest | none | in-progress |
-| 2 | Context, track, popup helpers + unit tests | 1 | todo |
-| 3 | Layout, shared components, page shells | 1, 2 | todo |
-| 4 | Team section and photos | 3 | todo |
-| 5 | Firebase hosting config and redirect site | 1 | todo |
+| 1 | Project scaffold, tokens, Vitest | none | done |
+| 2 | Context, track, popup helpers + unit tests | 1 | done |
+| 3 | Layout, shared components, page shells | 1, 2 | done |
+| 4 | Team section and photos | 3 | done |
+| 5 | Firebase hosting config and redirect site | 1 | in-progress |
 | 6 | Env guard, build:prod, deploy script | 1 | todo |
 | 7 | Playwright config and smoke e2e | 3, 4 | todo |
 | 8 | CI workflow: tests on push and PR | 6, 7 | todo |
