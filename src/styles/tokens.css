@@ -18,6 +18,16 @@
   --color-score-low: #8a3030;
   --color-score-low-background: #fbe9e9;
 
+  /* Section band backgrounds; adjacent sections on each page must differ. */
+  --tone-hero: #ffffff;
+  --tone-features: #e4f2ef;
+  --tone-evaluates: #eef2f7;
+  --tone-compare: #e8f6ee;
+  --tone-team: #f8f2e5;
+  --tone-benefits: #f1f4fa;
+  --tone-footer: #0a3b38;
+  --hdr: 64px;
+
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;

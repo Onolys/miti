@@ -43,7 +43,7 @@ test('learner sections, approved copy, comparison and CTAs are complete', async 
   expect(await main.locator(':scope > section').evaluateAll((sections) => sections.map((section) => section.id))).toEqual(['hero', 'features', 'evaluates', 'compare', 'team']);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Get your MI session evaluated. See the evidence for every score.');
   await expect(page.locator('#hero')).toContainText('A full MITI 4.2.1 evaluation of your transcript: global ratings, behavior counts, summary scores and feedback, each linked to the exact lines.');
-  await expect(page.locator('#hero')).toContainText('Role-play or de-identified transcripts. For practice and preparation, not official MITI coding.');
+  await expect(page.locator('#hero')).not.toContainText('not official MITI coding');
   await expect(page.locator('#hero [data-hero-signup]')).toHaveCount(1);
   await expect(page.locator('#features')).toContainText('Results in minutes, not the 1 to 2 weeks human coding takes.');
   await expect(page.locator('#evaluates article')).toHaveCount(6);
@@ -51,7 +51,6 @@ test('learner sections, approved copy, comparison and CTAs are complete', async 
   expect(await main.evaluate((element) => element.nextElementSibling?.tagName)).toBe('FOOTER');
   await expect(page.locator('footer')).toContainText('Not official MITI coding and cannot be submitted as one.');
   await expect(main).not.toContainText('$');
-  await expect(page.locator('a[href="/enterprise"]')).toHaveCount(0);
 
   const table = page.locator('#compare table');
   await expect(table.locator('thead th')).toHaveText(['Criterion', 'Human MITI coding', 'AI practice chatbots', 'Onolys']);
@@ -62,7 +61,7 @@ test('learner sections, approved copy, comparison and CTAs are complete', async 
   ]);
   await expect(table.locator('tbody td[data-highlighted="true"] strong')).toHaveCount(4);
   for (const section of ['features', 'evaluates', 'compare']) {
-    const cta = page.locator(`#${section} > [data-open-popup]`);
+    const cta = page.locator(`#${section} .cta-row > [data-open-popup]`);
     await expect(cta).toHaveAttribute('data-trigger', `section:${section}`);
     await cta.click();
     await expect(page.getByRole('dialog')).toBeVisible();

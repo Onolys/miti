@@ -31,7 +31,8 @@ test('enterprise sections, exact copy, comparison and trailing CTAs are complete
   expect(await main.locator(':scope > section').evaluateAll((sections) => sections.map(({ id }) => id))).toEqual(['hero', 'benefits', 'features', 'evaluates', 'compare', 'team']);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Quality-check your MITI coding. Every score, backed by the session.');
   await expect(page.locator('#hero')).toContainText("We read each coded sample against its transcript and flag the scores the session doesn't support, with line references.");
-  await expect(page.locator('#hero')).toContainText('Role-play or de-identified transcripts. For practice and preparation, not official MITI coding.');
+  await expect(page.locator('#hero')).not.toContainText('not official MITI coding');
+  await expect(page.locator('.hero-limits')).toHaveCount(0);
   await expect(page.locator('#hero [data-hero-signup]')).toHaveCount(1);
   await expect(page.locator('#hero [data-open-popup]')).toHaveCount(0);
   await expect(page.locator('#benefits article h3')).toHaveText(['Bulk evaluations', 'Quality control', 'Fast turnaround']);
@@ -51,7 +52,7 @@ test('enterprise sections, exact copy, comparison and trailing CTAs are complete
   await expect(table.locator('tbody [data-value]')).toHaveText(['Yes', 'Yes', 'Sometimes', 'Yes, linked lines', 'Days', 'Minutes', 'Needs more coders', 'Yes']);
   await expect(table.locator('tbody td[data-highlighted="true"] strong')).toHaveCount(4);
   for (const section of ['benefits', 'features', 'compare']) {
-    const cta = page.locator(`#${section} > [data-open-popup]`);
+    const cta = page.locator(`#${section} .cta-row > [data-open-popup]`);
     await expect(cta).toHaveAttribute('data-trigger', `section:${section}`);
     await cta.click();
     const dialog = page.getByRole('dialog');
@@ -61,7 +62,7 @@ test('enterprise sections, exact copy, comparison and trailing CTAs are complete
     await expect(dialog.locator('[name="how_often"]')).toHaveCount(0);
     await dialog.getByRole('button', { name: 'Close', exact: true }).click();
   }
-  await expect(page.locator('#evaluates > [data-trigger="section:evaluates"]')).toHaveCount(1);
+  await expect(page.locator('#evaluates .cta-row > [data-trigger="section:evaluates"]')).toHaveCount(1);
   expect(signupRequests).toEqual([]);
 });
 
@@ -125,7 +126,7 @@ test('Complete and Feedback tabs retain the shared role-play content', async ({ 
 
 test('enterprise CTA submits only the mocked step-2 enterprise context and fields', async ({ page, signupRequests }) => {
   await visit(page);
-  await page.locator('#benefits > [data-open-popup]').click();
+  await page.locator('#benefits .cta-row > [data-open-popup]').click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.getByLabel('Organization', { exact: true })).toBeVisible();
   await expect(dialog.getByLabel('Samples per month', { exact: true })).toBeVisible();
@@ -141,15 +142,17 @@ test('enterprise CTA submits only the mocked step-2 enterprise context and field
   }]);
 });
 
-test('enterprise is noindex and the full learner response has no enterprise links', async ({ page, request }) => {
+test('enterprise is noindex and the learner page links to enterprise only via header and footer', async ({ page, request }) => {
   await visit(page);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
   await expect(page.locator('link[rel~="canonical"]')).toHaveCount(0);
   const response = await request.get('/');
   expect(response.ok()).toBe(true);
-  expect(await response.text()).not.toMatch(/\bhref\s*=\s*["'][^"']*enterprise/i);
+  expect(await response.text()).toContain('href="/enterprise"');
   await page.goto('/');
-  await expect(page.locator('[href*="enterprise" i]')).toHaveCount(0);
+  await expect(page.locator('[href*="enterprise" i]')).toHaveCount(2);
+  await expect(page.locator('header a[href="/enterprise"]')).toHaveText('Enterprise');
+  await expect(page.locator('footer a[href="/enterprise"]')).toHaveCount(1);
 });
 
 test('360px layouts fit every tab, benefit card and labeled comparison card', async ({ page }) => {

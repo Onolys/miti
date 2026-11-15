@@ -34,6 +34,6 @@ describe('evaluation feature cards', () => {
     const cta = section.querySelector('[data-open-popup]')!;
     expect(cta.textContent).toBe('Get early access');
     expect(cta.getAttribute('data-trigger')).toBe('section:evaluates');
-    expect(section.lastElementChild).toBe(cta);
+    expect(section.querySelector('.container')?.lastElementChild?.lastElementChild).toBe(cta);
   });
 });

@@ -4,7 +4,7 @@ import { partnerLine, team } from '../data/team';
 import Section from './Section.astro';
 import CtaButton from './CtaButton.astro';
 ---
-<Section id="team" heading="Team" cta={false}>
+<Section id="team" tone="team" heading="Team" cta={false}>
   <div class="cards">
     {team.map((member) => (
       <article>

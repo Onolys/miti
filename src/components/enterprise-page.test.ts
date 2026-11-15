@@ -9,14 +9,15 @@ async function render() {
 }
 
 describe('enterprise landing page', () => {
-  it('assembles six sections with one exact hero headline and the shared disclaimer', async () => {
+  it('assembles six sections with one exact hero headline and no hero disclaimer', async () => {
     const doc = await render();
     const main = doc.querySelector('main')!;
     expect(Array.from(main.querySelectorAll(':scope > section')).map(({ id }) => id)).toEqual(['hero', 'benefits', 'features', 'evaluates', 'compare', 'team']);
     expect(doc.querySelectorAll('h1')).toHaveLength(1);
     expect(doc.querySelector('h1')?.textContent).toBe('Quality-check your MITI coding. Every score, backed by the session.');
     expect(doc.querySelector('#hero')?.textContent).toContain("We read each coded sample against its transcript and flag the scores the session doesn't support, with line references.");
-    expect(doc.querySelector('#hero')?.textContent).toContain('Role-play or de-identified transcripts. For practice and preparation, not official MITI coding.');
+    expect(doc.querySelector('#hero')?.textContent).not.toMatch(/not official MITI coding/i);
+    expect(doc.querySelector('.hero-limits')).toBeNull();
     expect(doc.querySelectorAll('[data-hero-signup]')).toHaveLength(1);
     expect(doc.querySelector('#hero [data-hero-signup]')).not.toBeNull();
     expect(doc.querySelector('#hero [data-open-popup]')).toBeNull();
@@ -28,7 +29,7 @@ describe('enterprise landing page', () => {
     const doc = await render();
     for (const id of ['benefits', 'features', 'evaluates', 'compare']) {
       expect(doc.querySelectorAll(`#${id} [data-open-popup]`)).toHaveLength(1);
-      expect(doc.querySelector(`#${id} > [data-open-popup]`)?.getAttribute('data-trigger')).toBe(`section:${id}`);
+      expect(doc.querySelector(`#${id} .cta-row > [data-open-popup]`)?.getAttribute('data-trigger')).toBe(`section:${id}`);
     }
     expect(doc.querySelector('#benefits')?.querySelectorAll('article')).toHaveLength(3);
     const heading = doc.querySelector('#features h2')!;

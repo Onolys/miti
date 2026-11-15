@@ -16,7 +16,8 @@ describe('learner landing page', () => {
     expect(doc.querySelectorAll('h1')).toHaveLength(1);
     expect(doc.querySelector('h1')?.textContent).toBe('Get your MI session evaluated. See the evidence for every score.');
     expect(main.querySelector('#hero')?.textContent).toContain('A full MITI 4.2.1 evaluation of your transcript: global ratings, behavior counts, summary scores and feedback, each linked to the exact lines.');
-    expect(main.querySelector('#hero')?.textContent).toContain('Role-play or de-identified transcripts. For practice and preparation, not official MITI coding.');
+    expect(main.querySelector('#hero')?.textContent).not.toMatch(/not official MITI coding/i);
+    expect(main.querySelector('.hero-limits')).toBeNull();
     expect(main.querySelectorAll('#hero [data-hero-signup]')).toHaveLength(1);
     expect(main.querySelectorAll('[data-hero-signup]')).toHaveLength(1);
     expect(main.nextElementSibling?.tagName).toBe('FOOTER');
@@ -27,7 +28,7 @@ describe('learner landing page', () => {
     const doc = await render();
     for (const id of ['features', 'evaluates', 'compare']) {
       expect(doc.querySelectorAll(`#${id} [data-open-popup]`)).toHaveLength(1);
-      expect(doc.querySelector(`#${id} > [data-open-popup]`)?.getAttribute('data-trigger')).toBe(`section:${id}`);
+      expect(doc.querySelector(`#${id} .cta-row > [data-open-popup]`)?.getAttribute('data-trigger')).toBe(`section:${id}`);
     }
     expect(doc.querySelector('#hero [data-open-popup]')).toBeNull();
     expect(doc.querySelector('#features h2')?.textContent).toBe('Features');
@@ -47,11 +48,8 @@ describe('learner landing page', () => {
     const doc = await render();
     const main = doc.querySelector('main')!;
     expect(main.textContent).not.toContain('$');
-    expect(doc.querySelector('a[href="/enterprise"]')).toBeNull();
+    expect(main.querySelector('a[href="/enterprise"]')).toBeNull();
     const officialText = Array.from(doc.querySelectorAll('p')).filter((p) => /official/i.test(p.textContent ?? '')).map((p) => p.textContent);
-    expect(officialText).toEqual([
-      'Role-play or de-identified transcripts. For practice and preparation, not official MITI coding.',
-      'Not official MITI coding and cannot be submitted as one. Use it to practice and prepare. Role-play or de-identified transcripts only.',
-    ]);
+    expect(officialText).toEqual([]);
   });
 });

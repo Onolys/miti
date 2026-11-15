@@ -21,13 +21,13 @@ const gaId = import.meta.env.PUBLIC_GA_ID ?? '';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <Seo {title} {description} {noindex} />
+    <Seo {title} {description} {noindex} path={page === 'enterprise' ? '/enterprise' : '/'} />
     <Analytics {gaId} />
   </head>
   <body id="top" data-page={page}>
-    <TopBar />
+    <TopBar {page} />
     <main><slot /></main>
-    <Footer />
+    <Footer {page} />
     <SignupDialog {page} />
     <script>
       import '../lib/track';

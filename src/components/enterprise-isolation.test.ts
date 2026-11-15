@@ -22,18 +22,12 @@ describe('enterprise search and navigation isolation', () => {
     expect(doc.querySelector('link[rel~="canonical"]')).toBeNull();
   });
 
-  it('keeps enterprise links out of the entire learner HTML, including the shell and dialog', async () => {
+  it('links enterprise only from the learner header and footer, with no robots exclusion', async () => {
     const container = await AstroContainer.create();
-    const html = await container.renderToString(Learner);
-    const doc = new JSDOM(html).window.document;
-    // Check the raw response as well as parsed href attributes, covering links in
-    // every component rather than only the visible main content.
-    expect(html).not.toMatch(/\bhref\s*=\s*["'][^"']*enterprise/i);
-    for (const element of doc.querySelectorAll('[href]')) {
-      expect(element.getAttribute('href')).not.toMatch(/enterprise/i);
-    }
-    expect(doc.querySelector('header')).not.toBeNull();
-    expect(doc.querySelector('footer')).not.toBeNull();
+    const doc = new JSDOM(await container.renderToString(Learner)).window.document;
+    const links = Array.from(doc.querySelectorAll('[href*="enterprise" i]'));
+    expect(links.map((link) => link.closest('header, footer, main')?.tagName)).toEqual(['HEADER', 'FOOTER']);
+    expect(doc.querySelector('main [href*="enterprise" i]')).toBeNull();
     expect(doc.querySelector('dialog')).not.toBeNull();
     for (const robots of doc.querySelectorAll('meta[name="robots"]')) {
       expect(robots.getAttribute('content')).not.toMatch(/noindex|nofollow/i);
