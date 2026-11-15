@@ -1,0 +1,37 @@
+---
+import Seo from '../components/Seo.astro';
+import Analytics from '../components/Analytics.astro';
+import TopBar from '../components/TopBar.astro';
+import Footer from '../components/Footer.astro';
+import SignupDialog from '../components/SignupDialog.astro';
+import '../styles/global.css';
+import type { Page } from '../lib/context';
+
+interface Props {
+  title: string;
+  description: string;
+  page: Page;
+  noindex?: boolean;
+}
+const { title, description, page, noindex = false } = Astro.props;
+const gaId = import.meta.env.PUBLIC_GA_ID ?? '';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Seo {title} {description} {noindex} />
+    <Analytics {gaId} />
+  </head>
+  <body id="top" data-page={page}>
+    <TopBar />
+    <main><slot /></main>
+    <Footer />
+    <SignupDialog />
+    <script>
+      import '../lib/track';
+      import '../lib/popup';
+    </script>
+  </body>
+</html>

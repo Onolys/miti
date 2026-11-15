@@ -1,14 +1,8 @@
 ---
-import '../styles/global.css';
+import Base from '../layouts/Base.astro';
+import TeamSection from '../components/TeamSection.astro';
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Onolys</title>
-  </head>
-  <body>
-    <main><h1>Onolys</h1></main>
-  </body>
-</html>
+<Base title="Onolys" description="Evidence-linked MI session evaluation for practice and preparation." page="learner">
+  <!-- SP04 sections -->
+  <TeamSection />
+</Base>
