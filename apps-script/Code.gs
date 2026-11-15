@@ -114,7 +114,38 @@ function formulaSafe(value) {
   return typeof value === 'string' && /^[=+@\-\t\r]/.test(value) ? "'" + value : value;
 }
 
-function doGet() {
-  return ContentService.createTextOutput(JSON.stringify({ ok: true, service: 'miti-signup' }))
+function jsonResponse(body) {
+  return ContentService.createTextOutput(JSON.stringify(body))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(event) {
+  try {
+    var parsed = parseAndValidate(event && event.postData && event.postData.contents);
+    if (!parsed.ok) return jsonResponse({ ok: false, error: parsed.error });
+    if (parsed.record.honeypot) return jsonResponse({ ok: true });
+
+    var lock = LockService.getScriptLock();
+    try {
+      lock.waitLock(10000);
+    } catch (timeout) {
+      return jsonResponse({ ok: false, error: 'busy' });
+    }
+    try {
+      var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+      var sheet = spreadsheet.getSheetByName('signups') || spreadsheet.insertSheet('signups');
+      var headers = ensureHeader(sheet);
+      upsert(sheet, parsed.record, new Date().toISOString(), headers);
+      SpreadsheetApp.flush();
+    } finally {
+      lock.releaseLock();
+    }
+    return jsonResponse({ ok: true });
+  } catch (error) {
+    return jsonResponse({ ok: false, error: 'server' });
+  }
+}
+
+function doGet() {
+  return jsonResponse({ ok: true, service: 'miti-signup' });
 }
