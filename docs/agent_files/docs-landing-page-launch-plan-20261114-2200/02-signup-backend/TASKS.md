@@ -4,7 +4,7 @@ summary: 6 tasks to build, test, document and probe the Apps Script sign-up back
 date: 2026-11-15
 ---
 # Tasks: Sign-up backend (Apps Script)
-Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan/docs/agent_files/docs-landing-page-launch-plan-20261114-2200/02-signup-backend/PRD.md. One pasteable `Code.gs` plus Node tests that load the real file in a `vm` context with mocked Google services. Tests run under SP01's Vitest runner and CI (no separate CI task here); this SP only adds its test files.
+Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan/docs/agent_files/docs-landing-page-launch-plan-20261114-2200/02-signup-backend/PRD.md. Built on branch `docs/landing-page-launch-plan` in the existing worktree. One pasteable `Code.gs` plus Node tests that load the real file in a `vm` context with mocked Google services. Tests run under SP01's Vitest runner and CI (no separate CI task here); this SP only adds its test files.
 
 | # | Task | Depends on | Status |
 |---|---|---|---|

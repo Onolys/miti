@@ -5,7 +5,7 @@ date: 2026-11-15
 ---
 # Tasks: SP03 Sign-up UI
 
-Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan/docs/agent_files/docs-landing-page-launch-plan-20261114-2200/03-signup-ui/PRD.md. Built on `feat/landing-page`. Vanilla TS, native `<dialog>`, no framework. Depends on SP01 (T1 config.ts, T2 getPage/getSrc/track/popup, T3 Base.astro and shells, T7 Playwright, T8 CI) and SP02's frozen request/response contract. CI is SP01 T8; no CI task here.
+Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan/docs/agent_files/docs-landing-page-launch-plan-20261114-2200/03-signup-ui/PRD.md. Built on `docs/landing-page-launch-plan`. Vanilla TS, native `<dialog>`, no framework. Depends on SP01 (T1 config.ts, T2 getPage/getSrc/track/popup, T3 Base.astro and shells, T7 Playwright, T8 CI) and SP02's frozen request/response contract. CI is SP01 T8; no CI task here.
 
 | # | Task | Depends on | Status |
 |---|---|---|---|

@@ -5,7 +5,7 @@ date: 2026-11-15
 ---
 # PRD: Sign-up backend (Apps Script)
 
-Repo/branch: miti, `feat/landing-page` · Depends on: nothing (Phase 1) · Owns: `apps-script/Code.gs`, `apps-script/README.md` (deploy + probe steps), `apps-script/probe.html`, `apps-script/__tests__/*` (test runner itself is SP01's)
+Repo/branch: miti, `docs/landing-page-launch-plan` · Depends on: nothing (Phase 1) · Owns: `apps-script/Code.gs`, `apps-script/README.md` (deploy + probe steps), `apps-script/probe.html`, `apps-script/__tests__/*` (test runner itself is SP01's)
 
 ## TL;DR
 One `Code.gs` file the owner pastes into a Sheet-bound Apps Script and deploys as a web app. `doPost` takes a text/plain JSON body, silently drops honeypot hits, locks, and upserts one row per email+page. Step 2 fills the row step 1 made, never blanking it. Tested in Node by loading the real file into a `vm` context with mocked Google services. Biggest unknown: whether a browser can read the response cross-origin. An early probe settles it.

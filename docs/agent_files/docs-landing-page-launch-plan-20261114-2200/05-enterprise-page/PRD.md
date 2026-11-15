@@ -5,7 +5,7 @@ date: 2026-11-15
 ---
 # PRD: SP05 Enterprise page `/enterprise`
 
-Repo/branch: `miti`, `feat/landing-page` · Depends on: SP01 (shell, Base `noindex`, Section, CtaButton, Team), SP03 (`<HeroForm/>`, enterprise popup fields), SP04 (roleplay, miti, FeatureTabs, mockups, EvaluatesSection, CompareTable, highlight.ts)
+Repo/branch: `miti`, `docs/landing-page-launch-plan` · Depends on: SP01 (shell, Base `noindex`, Section, CtaButton, Team), SP03 (`<HeroForm/>`, enterprise popup fields), SP04 (roleplay, miti, FeatureTabs, mockups, EvaluatesSection, CompareTable, highlight.ts)
 **Owns:** `src/pages/enterprise.astro` (SP05 slot only), `src/components/{BenefitsSection}.astro`, `src/components/mockups/QcMockup.astro`, `src/data/{benefits,roleplay.qc,compare.enterprise}.ts`, `src/data/roleplay.qc.test.ts`, `e2e/enterprise.spec.ts`. Does not edit `roleplay.ts`, SP04 components, tokens, popup fields.
 
 ## TL;DR

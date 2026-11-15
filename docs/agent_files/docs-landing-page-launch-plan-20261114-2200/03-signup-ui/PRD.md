@@ -5,7 +5,7 @@ date: 2026-11-15
 ---
 # PRD: SP03 Sign-up UI
 
-Repo/branch: `miti`, `feat/landing-page` · Depends on: SP01 (CTA/event/helpers/test setup), SP02 (request/response contract) · Owns: `src/components/{HeroForm,SignupDialog}.astro`, `src/lib/signup/{client,body,dialog,hero}.ts`, `src/data/signup-fields.ts`, `src/styles/signup.css`, `src/lib/signup/__tests__/*`, `e2e/signup.spec.ts`. Small edits to SP01 files: mount `<SignupDialog/>` in `Base.astro`; add `PUBLIC_SIGNUP_PLAN` to `.env.example`; `src/lib/config.ts` (see open item 1).
+Repo/branch: `miti`, `docs/landing-page-launch-plan` · Depends on: SP01 (CTA/event/helpers/test setup), SP02 (request/response contract) · Owns: `src/components/{HeroForm,SignupDialog}.astro`, `src/lib/signup/{client,body,dialog,hero}.ts`, `src/data/signup-fields.ts`, `src/styles/signup.css`, `src/lib/signup/__tests__/*`, `e2e/signup.spec.ts`. Small edits to SP01 files: mount `<SignupDialog/>` in `Base.astro`; add `PUBLIC_SIGNUP_PLAN` to `.env.example`; `src/lib/config.ts` (see open item 1).
 
 ## TL;DR
 Vanilla TS, no framework. `HeroForm` (embedded by SP04/05) posts step 1, shows thanks, then fires `miti:open-popup` with the email. One `SignupDialog` per page (native `<dialog>`) listens for that event, renders the per-page field set from a config file, posts step 2, and swaps to "Thank you for signing up." A small `client.ts` owns the POST (text/plain, timeout, one `busy` retry, Plan A/B switch). GA via SP01's `track()`.

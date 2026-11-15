@@ -6,7 +6,7 @@ date: 2026-11-15
 
 # miti landing page — design index
 
-**TL;DR.** Two static Astro pages (`/` learners, `/enterprise` orgs) on Firebase Hosting at `miti.onolys.com`. Sign-ups go through a Google Apps Script web app into a Google Sheet; no server. Purpose is customer discovery only. [brainstorm.md](brainstorm.md) is the approved brief and the source of truth. Code goes on branch `feat/landing-page` off `main`.
+**TL;DR.** Two static Astro pages (`/` learners, `/enterprise` orgs) on Firebase Hosting at `miti.onolys.com`. Sign-ups go through a Google Apps Script web app into a Google Sheet; no server. Purpose is customer discovery only. [brainstorm.md](brainstorm.md) is the approved brief and the source of truth. Implementation continues on the existing branch `docs/landing-page-launch-plan` in `/root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan`; do not create a new branch or worktree.
 
 ## Sub-projects
 

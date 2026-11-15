@@ -6,7 +6,7 @@ date: 2026-11-15
 
 # PRD: SP01 Site foundation
 
-Repo/branch: `miti`, `feat/landing-page` (off main) · Depends on: none (Phase 1) · Owns: everything under "Owns" below; SP02-05 add to it, never restructure it.
+Repo/branch: `miti`, `docs/landing-page-launch-plan` (existing worktree) · Depends on: none (Phase 1) · Owns: everything under "Owns" below; SP02-05 add to it, never restructure it.
 
 **Owns:** `package.json`, `astro.config.mjs`, `tsconfig.json`, `.env.example`, `src/layouts/Base.astro`, `src/components/{TopBar,Footer,Section,CtaButton,TeamSection,Seo,Analytics}.astro`, `src/data/team.ts`, `src/styles/{tokens,global}.css`, `src/lib/{context,track,popup,config}.ts`, `src/pages/{index,enterprise}.astro` (shells), `src/assets/team/*`, `firebase.json`, `.firebaserc`, `redirect/index.html`, `scripts/check-env.mjs`, `playwright.config.ts`, `vitest.config.ts`, `.github/workflows/ci.yml`.
 

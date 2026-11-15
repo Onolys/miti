@@ -5,7 +5,7 @@ date: 2026-11-15
 ---
 # Tasks: SP05 Enterprise page `/enterprise`
 
-Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan/docs/agent_files/docs-landing-page-launch-plan-20261114-2200/05-enterprise-page/PRD.md. Built on `feat/landing-page`. Composes SP04 parts unchanged; SP05 edits only the `enterprise.astro` slot and its own files. Depends on SP01 (T1 Vitest, T3 Base `noindex`/`Section`/`CtaButton`, T4 `TeamSection`, T5 `firebase.json`, T7 Playwright, T8 CI runs every test here; no CI task in this SP), SP03 T3 (`HeroForm`) and SP04 T2 (roleplay), T1 (`summarize`), T3 (`highlight.ts`, `TranscriptPane`), T4 (Complete/Feedback mockups), T5 (`FeatureTabs`), T6 (`EvaluatesSection`), T7 (`CompareTable`). Tests are written first. All open items are resolved; no [OPEN] remain.
+Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan/docs/agent_files/docs-landing-page-launch-plan-20261114-2200/05-enterprise-page/PRD.md. Built on `docs/landing-page-launch-plan`. Composes SP04 parts unchanged; SP05 edits only the `enterprise.astro` slot and its own files. Depends on SP01 (T1 Vitest, T3 Base `noindex`/`Section`/`CtaButton`, T4 `TeamSection`, T5 `firebase.json`, T7 Playwright, T8 CI runs every test here; no CI task in this SP), SP03 T3 (`HeroForm`) and SP04 T2 (roleplay), T1 (`summarize`), T3 (`highlight.ts`, `TranscriptPane`), T4 (Complete/Feedback mockups), T5 (`FeatureTabs`), T6 (`EvaluatesSection`), T7 (`CompareTable`). Tests are written first. All open items are resolved; no [OPEN] remain.
 
 | # | Task | Depends on | Status |
 |---|---|---|---|

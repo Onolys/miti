@@ -5,11 +5,11 @@ date: 2026-11-15
 ---
 # Tasks: SP01 Site foundation
 
-Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan/docs/agent_files/docs-landing-page-launch-plan-20261114-2200/01-site-foundation/PRD.md. Built on branch `feat/landing-page` off main. Repo has no code and no `.github/` yet, so everything is fresh. SP02-05 add to this skeleton, never restructure it.
+Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan/docs/agent_files/docs-landing-page-launch-plan-20261114-2200/01-site-foundation/PRD.md. Built on branch `docs/landing-page-launch-plan` in the existing worktree. Repo has no code and no `.github/` yet, so everything is fresh. SP02-05 add to this skeleton, never restructure it.
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Project scaffold, tokens, Vitest | none | todo |
+| 1 | Project scaffold, tokens, Vitest | none | in-progress |
 | 2 | Context, track, popup helpers + unit tests | 1 | todo |
 | 3 | Layout, shared components, page shells | 1, 2 | todo |
 | 4 | Team section and photos | 3 | todo |
@@ -57,7 +57,7 @@ Done when: smoke e2e passes on both projects: both routes load, top bar CTA disp
 ## Task 8 — CI workflow: tests on push and PR
 What it is / what it means: CI exists before any feature code lands (R8; decision 12). SP01 owns it.
 What changes at a high level: `.github/workflows/ci.yml` test job on push and PR: checkout, setup-node LTS with npm cache, `npm ci`, `astro check`, `vitest run`, `npm run build` with dummy `PUBLIC_SIGNUP_URL` and `PUBLIC_GA_ID` as plain workflow env, `playwright install --with-deps chromium`, `playwright test`, upload report on failure.
-Done when: workflow YAML lints; a push to `feat/landing-page` runs it and Vitest plus both Playwright projects pass green in GitHub Actions.
+Done when: workflow YAML lints; a push to `docs/landing-page-launch-plan` runs it and Vitest plus both Playwright projects pass green in GitHub Actions.
 
 ## Task 9 — CI deploy job on push to main
 What it is / what it means: Automatic deploy after green tests (R8; decision 13).

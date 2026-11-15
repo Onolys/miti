@@ -54,7 +54,7 @@ Customer discovery for the Onolys MI evaluation (launch plan, Jira ONOLYS-72). B
 | Hero save failure: the popup still opens (its save creates the row) | Block the popup | Claude's call |
 | Sheet formula-injection guard | None | Claude's call |
 | `/enterprise` gets noindex; `www` redirects too | Indexed `/enterprise` | Claude's call |
-| Build happens in the miti repo on new branch `feat/landing-page` off main | Build in this docs branch | Claude's call |
+| Build continues in the miti repo on existing branch `docs/landing-page-launch-plan` in its existing worktree | Create a new implementation branch/worktree | Tejit (explicit implementation instruction) |
 | Playwright e2e for the sign-up flow; unit tests for the Apps Script logic | Manual testing only | Claude's call |
 | "Done" means deployed; going live waits on owner steps | Done = merged | Claude's call |
 

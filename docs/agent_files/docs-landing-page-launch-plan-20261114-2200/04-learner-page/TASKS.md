@@ -5,7 +5,7 @@ date: 2026-11-15
 ---
 # Tasks: SP04 Learner page `/`
 
-Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan/docs/agent_files/docs-landing-page-launch-plan-20261114-2200/04-learner-page/PRD.md. Built on branch `feat/landing-page`. Depends on SP01 (Vitest SP01 T1, `Section`/`CtaButton`/layout SP01 T3, `TeamSection` SP01 T4, Playwright SP01 T7, CI SP01 T8 runs every test here; no CI task in this SP) and SP03's `HeroForm` (SP03 T3). All tests are written first. SP05 reuses most outputs, so keep everything parameterized.
+Source of truth: /root/projects/onolys/miti/.worktrees/docs/landing-page-launch-plan/docs/agent_files/docs-landing-page-launch-plan-20261114-2200/04-learner-page/PRD.md. Built on branch `docs/landing-page-launch-plan`. Depends on SP01 (Vitest SP01 T1, `Section`/`CtaButton`/layout SP01 T3, `TeamSection` SP01 T4, Playwright SP01 T7, CI SP01 T8 runs every test here; no CI task in this SP) and SP03's `HeroForm` (SP03 T3). All tests are written first. SP05 reuses most outputs, so keep everything parameterized.
 
 | # | Task | Depends on | Status |
 |---|---|---|---|

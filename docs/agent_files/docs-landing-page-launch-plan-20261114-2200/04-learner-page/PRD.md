@@ -6,7 +6,7 @@ date: 2026-11-15
 
 # PRD: SP04 Learner page `/`
 
-Repo/branch: `miti`, `feat/landing-page` · Depends on: SP01 (layout, `Section`, `CtaButton`, tokens, Team shell); SP03 (`HeroForm`, interface below) · Consumed by: SP05 (`/enterprise`)
+Repo/branch: `miti`, `docs/landing-page-launch-plan` · Depends on: SP01 (layout, `Section`, `CtaButton`, tokens, Team shell); SP03 (`HeroForm`, interface below) · Consumed by: SP05 (`/enterprise`)
 
 **Owns:** `src/pages/index.astro` (SP04 slot only), `src/data/{roleplay,evaluates,compare.learner}.ts`, `src/lib/{miti,tabs,highlight}.ts`, `src/components/{Hero,FeatureTabs,EvaluatesSection,CompareTable,TranscriptPane}.astro` (`TranscriptPane` is used by EvidenceMockup and reused by SP05 QcMockup), `src/components/mockups/{Evidence,Complete,Feedback}Mockup.astro`, `src/**/*.test.ts` for these, `e2e/learner.spec.ts`. Does not touch tokens, `Section`, `TeamSection`, `enterprise.astro`.
 
