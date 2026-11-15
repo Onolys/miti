@@ -62,6 +62,39 @@ it('deploys only after tests succeed on a push to main, using real repository va
   expect(job.steps.some((step: { uses?: string }) => step.uses?.includes('upload-artifact'))).toBe(false);
 });
 
+it('deploys previews only for tested same-repository pull requests with scoped permissions', () => {
+  const config = workflow();
+  const job = config.jobs.preview;
+  expect(job).toBeDefined();
+  expect(job.needs).toBe('test');
+  expect(job.if).toBe("github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository");
+  expect(job.permissions).toEqual({ contents: 'read', checks: 'write', 'pull-requests': 'write' });
+  expect(job.concurrency).toEqual({
+    group: 'hosting-preview-${{ github.event.number }}',
+    'cancel-in-progress': true,
+  });
+  expect(job.env).toEqual(config.jobs.deploy.env);
+  const commands = job.steps.filter((step: { run?: string }) => step.run).map((step: { run: string }) => step.run);
+  expect(commands).toEqual(['npm ci', 'npm run build:prod']);
+});
+
+it('updates one expiring preview channel per PR and comments its URL without deploying live or redirects', () => {
+  const job = workflow().jobs.preview;
+  expect(job).toBeDefined();
+  const deploy = job.steps.find((step: { uses?: string }) => step.uses?.startsWith('FirebaseExtended/action-hosting-deploy@'));
+  expect(deploy?.uses).toBe('FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a');
+  expect(deploy.with).toEqual({
+    repoToken: '${{ secrets.GITHUB_TOKEN }}',
+    firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}',
+    projectId: 'onolys',
+    target: 'miti',
+    channelId: 'pr-${{ github.event.number }}',
+    expires: '7d',
+    firebaseToolsVersion: '15.36.0',
+  });
+  expect(job.steps.some((step: { uses?: string }) => step.uses?.includes('upload-artifact'))).toBe(false);
+});
+
 
 it.each([0, 7])('removes scoped credentials after Firebase exits %s', (exitCode) => {
   const job = workflow().jobs.deploy;
