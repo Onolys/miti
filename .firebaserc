@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "onolys"
+  },
+  "targets": {
+    "onolys": {
+      "hosting": {
+        "miti": [
+          "onolys"
+        ],
+        "redirect": [
+          "onolys-redirect"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
