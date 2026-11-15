@@ -66,7 +66,7 @@ Code sharing: one file, `Code.gs`, with pure functions on top and `doPost`/`doGe
 - Plan B (only if the probe shows the response is unreadable): same call with `mode:'no-cors'`. The response is opaque, so a resolved promise means "sent, unconfirmed" and SP03 shows success. A rejected promise means failure. Safe because the upsert is idempotent.
 - SP03 mocks the endpoint with Plan A's shape; the plan switch is one function.
 
-**Quotas and spam**: expect Apps Script daily trigger/runtime and concurrent-execution limits and the Sheet 10M-cell cap to be far above launch traffic [OPEN: confirm current numbers for the owner's account type]. Spam shows as junk emails, since honeypot hits are silent and leave no trace. Owner checks the Sheet daily in week 1 per the brief's risk table.
+**Quotas and spam**: expect Apps Script daily trigger/runtime and concurrent-execution limits and the Sheet 10M-cell cap to be far above launch traffic [DEFERRED: verify at implementation]. Spam shows as junk emails, since honeypot hits are silent and leave no trace. Owner checks the Sheet daily in week 1 per the brief's risk table.
 
 ## Decisions
 | # | Decision | Choice | Alternatives considered | Why |
