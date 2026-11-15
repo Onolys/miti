@@ -27,7 +27,8 @@ import { learnerSuggestions, learnerTabs } from '../data/features';
     <p class="turnaround">Results in minutes, not the 1 to 2 weeks human coding takes.</p>
   </Section>
   <EvaluatesSection />
-  <Section id="compare" tone="compare" heading="How it compares">
+  <Section id="compare" tone="compare" heading="Where Onolys fits">
+    <p class="compare-intro">Practice simulators help you build skills; Onolys evaluates the sessions you run.</p>
     <CompareTable {columns} {rows} {highlight} {shortColumns} {widths} idPrefix="learner-compare" />
   </Section>
   <TeamSection />
@@ -35,4 +36,5 @@ import { learnerSuggestions, learnerTabs } from '../data/features';
 
 <style>
   .turnaround { margin-top: 1rem; text-align: center; font-size: 0.85rem; color: var(--color-gray-600); }
+  .compare-intro { margin: -0.5rem 0 1.5rem; text-align: center; font-size: 0.85rem; color: var(--color-gray-600); }
 </style>

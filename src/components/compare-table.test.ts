@@ -7,11 +7,11 @@ import CompareTable from './CompareTable.astro';
 import type { CompareRow } from '../lib/compare';
 
 const expectedRows = [
-  { criterion: 'Your own session', values: ['Yes', 'No, a simulated chat', 'Yes'] },
-  { criterion: 'Full MITI 4.2.1 coding', values: ['Yes', 'No, "MITI-informed"', 'Yes'] },
+  { criterion: 'Your own session', values: ['Yes', 'Simulated client', 'Yes'] },
+  { criterion: 'Full MITI 4.2.1 coding', values: ['Yes', 'Varies', 'Yes'] },
   { criterion: 'Evidence for every score', values: ['Sometimes', 'Rarely', 'Yes'] },
   { criterion: 'Session length', values: ['Full session', 'Limited, short chats', 'Full session'] },
-  { criterion: 'Cost', values: ['$40–$80 per session', 'Expensive subscriptions', 'Low (pricing coming soon)'] },
+  { criterion: 'Cost', values: ['$40–$80 per session', 'Monthly subscription', 'Low (pricing coming soon)'] },
   { criterion: 'Turnaround', values: ['About 1 to 2 weeks', '—', 'Minutes'] },
 ];
 
@@ -22,10 +22,10 @@ async function render(props: { columns: readonly string[]; rows: readonly Compar
 
 describe('learner comparison', () => {
   it('keeps all approved columns, row labels, and values exact', () => {
-    expect(columns).toEqual(['Human MITI coding', 'AI practice chatbots', 'Onolys']);
+    expect(columns).toEqual(['Human MITI coding', 'Practice simulators', 'Onolys']);
     expect(rows).toEqual(expectedRows);
     expect(highlight).toBe(2);
-    expect(shortColumns).toEqual(['Human coding', 'AI chatbots', 'Onolys']);
+    expect(shortColumns).toEqual(['Human coding', 'Simulators', 'Onolys']);
     expect(widths).toEqual([22, 24, 24, 30]);
   });
 
@@ -83,7 +83,7 @@ describe('learner comparison', () => {
     const mobile = doc.querySelector('[data-compare-mobile]')!;
     expect(mobile.hasAttribute('data-tabs')).toBe(true);
     const tabs = Array.from(mobile.querySelectorAll('[role="tab"]'));
-    expect(tabs.map((tab) => tab.textContent)).toEqual(['Human coding', 'AI chatbots', 'Onolys']);
+    expect(tabs.map((tab) => tab.textContent)).toEqual(['Human coding', 'Simulators', 'Onolys']);
     expect(tabs.map((tab) => tab.getAttribute('aria-selected'))).toEqual(['false', 'false', 'true']);
     const panels = Array.from(mobile.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
     expect(panels).toHaveLength(3);
@@ -109,7 +109,7 @@ describe('learner comparison', () => {
     expect(doc.querySelector('tbody th h3')?.textContent).toBe('Example criterion');
     expect(doc.querySelector('tbody td[data-highlighted="true"] strong')?.textContent).toBe('Flagged lines');
     expect(doc.body.textContent).not.toContain('Onolys');
-    expect(doc.body.textContent).not.toContain('AI practice chatbots');
+    expect(doc.body.textContent).not.toContain('Practice simulators');
     expect(doc.querySelector('colgroup')).toBeNull();
     expect(doc.querySelectorAll('[data-compare-mobile] [role="tab"]')).toHaveLength(2);
   });
