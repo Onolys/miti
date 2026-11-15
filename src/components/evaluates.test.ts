@@ -7,7 +7,7 @@ import EvaluatesSection from './EvaluatesSection.astro';
 const expectedCards = [
   { headline: 'Full MITI 4.2.1', line: '4 global ratings (1 to 5) and 10 behavior codes, not just counts.' },
   { headline: 'Traceable', line: 'every code and rating links to its transcript lines.' },
-  { headline: 'Benchmarked', line: '% complex reflections, reflection-to-question ratio and technical/relational averages, each against MITI fair/good levels.' },
+  { headline: 'Benchmarked', line: 'Summary scores checked against MITI fair/good levels.' },
   { headline: 'Change-goal aware', line: 'scored against the target behavior you name, as MITI requires.' },
   { headline: 'Your own session', line: 'your real transcript, not a chat with a simulated client.' },
   { headline: 'Minutes, not weeks', line: 'Feedback while the session is still fresh.' },
@@ -30,10 +30,11 @@ describe('evaluation feature cards', () => {
       expect(card.querySelector('h3')?.textContent).toBe(expectedCards[index].headline);
       expect(card.querySelector('p')?.textContent).toBe(expectedCards[index].line);
     });
+    expect(doc.querySelector('.evaluation-cards')).not.toBeNull();
     expect(section.querySelectorAll('[data-open-popup]')).toHaveLength(1);
     const cta = section.querySelector('[data-open-popup]')!;
     expect(cta.textContent).toBe('Get early access');
     expect(cta.getAttribute('data-trigger')).toBe('section:evaluates');
-    expect(section.lastElementChild).toBe(cta);
+    expect(section.querySelector('.container')?.lastElementChild?.lastElementChild).toBe(cta);
   });
 });

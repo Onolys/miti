@@ -167,8 +167,8 @@ test('unset signup URL and GA ID in development simulate both saves after 300ms 
     await expect(hero).toHaveAttribute('aria-busy', 'true');
     await expect(page.getByRole('dialog')).toBeVisible();
     const elapsed = await page.evaluate(() => performance.getEntriesByName('dev-signup-delay')[0].duration);
-    expect(elapsed).toBeGreaterThanOrEqual(275);
-    expect(elapsed).toBeLessThan(1500);
+    // The popup opens optimistically, before the simulated 300ms save resolves.
+    expect(elapsed).toBeLessThan(250);
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('button', { name: 'Get early access', exact: true }).click();
     await expect(dialog.locator('form')).toHaveAttribute('aria-busy', 'true');

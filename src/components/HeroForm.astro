@@ -10,7 +10,7 @@ const { id = 'hero-signup', label = 'Get early access' } = Astro.props;
 const emailId = `${id}-email`;
 const errorId = `${id}-error`;
 ---
-<form {id} class="hero-signup" data-hero-signup novalidate aria-busy="false">
+<form {id} class="hero-signup" data-hero-signup method="post" action="#" novalidate aria-busy="false">
   <div class="hero-signup-row" data-hero-row>
     <label class="signup-visually-hidden" for={emailId}>Email</label>
     <input

@@ -166,7 +166,7 @@ describe('signup dialog', () => {
       email: 'Person@example.com', honeypot: 'bot', fields: { role: 'Researcher', anything_else: 'Some private feedback' },
     });
     expect(button.disabled).toBe(true);
-    expect(button.textContent).toBe('Sending…');
+    expect(button.textContent).toBe('Submitting');
     expect(form.getAttribute('aria-busy')).toBe('true');
     finish({ ok: true, confirmed });
     await vi.waitFor(() => expect(success.hidden).toBe(false));
@@ -283,7 +283,7 @@ describe('signup dialog', () => {
     expect(email.value).toBe('new@example.com');
     expect(email.getAttribute('aria-invalid')).toBe('false');
     expect(button.disabled).toBe(true);
-    expect(button.textContent).toBe('Sending…');
+    expect(button.textContent).toBe('Submitting');
     expect(form.getAttribute('aria-busy')).toBe('true');
     expect(error.hidden).toBe(true);
     pending[1]({ ok: true, confirmed: true });
@@ -300,5 +300,45 @@ describe('signup dialog', () => {
     dialog.close();
     open();
     expect(track).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows a spinner with an accessible label while step 2 sends and restores the label after', async () => {
+    let finish!: (result: SignupResult) => void;
+    postSignup.mockReturnValue(new Promise<SignupResult>((resolve) => { finish = resolve; }));
+    const { form, button } = await initialize('Person@example.com');
+    submit(form);
+    expect(button.disabled).toBe(true);
+    expect(button.querySelector('.signup-spinner')?.getAttribute('aria-hidden')).toBe('true');
+    expect(button.textContent).toBe('Submitting');
+    finish({ ok: false, error: 'network' });
+    await vi.waitFor(() => expect(button.disabled).toBe(false));
+    expect(button.textContent).toBe('Get early access');
+    expect(button.querySelector('.signup-spinner')).toBeNull();
+  });
+
+  it('waits for the in-flight step 1 before posting step 2', async () => {
+    const { setPendingStep1 } = await import('../pending');
+    let finishStep1!: (result: SignupResult) => void;
+    setPendingStep1(new Promise<SignupResult>((resolve) => { finishStep1 = resolve; }));
+    postSignup.mockResolvedValue({ ok: true, confirmed: true });
+    const { form } = await initialize('Person@example.com');
+    submit(form);
+    await Promise.resolve();
+    expect(postSignup).not.toHaveBeenCalled();
+    finishStep1({ ok: true, confirmed: true });
+    await vi.waitFor(() => expect(postSignup).toHaveBeenCalledExactlyOnceWith(2, expect.objectContaining({ email: 'Person@example.com' })));
+  });
+
+  it('dispatches miti:signup-complete with the email when step 2 succeeds', async () => {
+    postSignup.mockResolvedValue({ ok: true });
+    const { form, email, success } = await initialize();
+    const completed = vi.fn();
+    document.addEventListener('miti:signup-complete', completed);
+    email.value = 'a@b.co';
+    submit(form);
+    await vi.waitFor(() => expect(success.hidden).toBe(false));
+    expect(completed).toHaveBeenCalledTimes(1);
+    expect((completed.mock.calls[0][0] as CustomEvent).detail).toEqual({ email: 'a@b.co' });
+    document.removeEventListener('miti:signup-complete', completed);
   });
 });

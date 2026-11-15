@@ -14,7 +14,7 @@ const { page = 'learner' } = Astro.props;
       <h2 id="signup-title">Get early access</h2>
       <button class="signup-close" type="button" data-signup-close aria-label="Close">×</button>
     </header>
-    <form class="signup-dialog-form" data-signup-form novalidate aria-busy="false">
+    <form class="signup-dialog-form" data-signup-form method="post" action="#" novalidate aria-busy="false">
       <div class="signup-dialog-body">
         <p class="signup-intro">Tell us a bit about you. Everything except email is optional.</p>
         <div class="signup-field">

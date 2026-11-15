@@ -16,6 +16,8 @@ it.each(['learner', 'enterprise'] as const)('renders a labelled native dialog wi
   expect(dialog.querySelector('[data-signup-entry] button[data-signup-close]')?.getAttribute('aria-label')).toBe('Close');
   const form = dialog.querySelector('form')!;
   expect(form.hasAttribute('novalidate')).toBe(true);
+  expect(form.getAttribute('method')).toBe('post');
+  expect(form.getAttribute('action')).toBe('#');
   const email = form.querySelector<HTMLInputElement>('[name="email"]')!;
   expect(email.required).toBe(true);
   expect(email.type).toBe('email');

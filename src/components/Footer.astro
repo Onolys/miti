@@ -1,19 +1,32 @@
+---
+import type { Page } from '../lib/context';
+interface Props {
+  page: Page;
+}
+const { page } = Astro.props;
+---
 <footer>
-  <p>Not official MITI coding and cannot be submitted as one. Use it to practice and prepare. Role-play or de-identified transcripts only.</p>
-  <p>Questions? Reach out to <a href="mailto:tejitpabari99@gmail.com">tejitpabari99@gmail.com</a></p>
+  <div class="container">
+    <ul data-inline-list>
+      <li>Not official MITI coding and cannot be submitted as one.</li>
+      <li>Use it to practice and prepare.</li>
+      <li>Role-play or de-identified transcripts only.</li>
+    </ul>
+    {page === 'enterprise'
+      ? <p data-footer-switch>Individuals? <a href="/">Click here</a> — evaluate your own MI session with evidence for every score.</p>
+      : <p data-footer-switch>Enterprise? <a href="/enterprise">Click here</a> — bulk evaluations and quality control for your team's MITI coding.</p>}
+    <p>Questions? Reach out to <a href="mailto:tejitpabari99@gmail.com">tejitpabari99@gmail.com</a></p>
+    <p class="copy">© 2026 Onolys. All rights reserved.</p>
+  </div>
 </footer>
 
 <style>
-  footer {
-    width: min(100%, 72rem);
-    margin-inline: auto;
-    padding: var(--space-8) var(--gutter);
-    color: var(--color-gray-600);
-    font-size: var(--font-size-sm);
-    overflow-wrap: anywhere;
-  }
-
-  a {
-    color: var(--color-accent);
-  }
+  footer { background: var(--tone-footer); color: #dcebe9; padding-block: 3.5rem; font-size: 0.95rem; overflow-wrap: anywhere; }
+  a { color: #9fe3d8; }
+  ul { margin: 0 0 1.75rem; padding: 0; list-style: none; }
+  li { display: inline; }
+  li + li::before { content: ' · '; white-space: pre; color: #9fcfc8; }
+  p { margin: 0; }
+  p + p { margin-top: 0.75rem; }
+  .copy { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.15); font-size: 0.8rem; color: #9fcfc8; }
 </style>

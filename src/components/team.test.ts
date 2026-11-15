@@ -1,53 +1,74 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { JSDOM } from 'jsdom';
-import { expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { partnerLine, team } from '../data/team';
 import TeamSection from './TeamSection.astro';
 
-it('renders all three team members with the approved bios and accessible photo/link details', async () => {
+const expected = [
+  { name: 'Tejit Pabari', lead: 'Engineer at Microsoft', rest: ', 8+ years building cloud systems and AI tooling @PowerBI. Columbia CS.', linkedin: 'https://www.linkedin.com/in/tejitpabari/' },
+  { name: 'Gitika Bose', lead: 'AI Researcher and Data Scientist at Bing Search', rest: ', working on grounding, hallucination and fact-checking. Columbia CS.', linkedin: 'https://www.linkedin.com/in/gitikabose/' },
+  { name: 'Frédérique Escudier, Ph.D., Psy.D.', lead: 'Clinical neuropsychologist', rest: ', 15+ years experience in cognitive assessment. Former president, Quebec Association of Neuropsychologists.', linkedin: 'https://www.linkedin.com/in/escudierfrederique/' },
+];
+
+async function render() {
   const container = await AstroContainer.create();
-  const doc = new JSDOM(await container.renderToString(TeamSection)).window.document;
-  const cards = Array.from(doc.querySelectorAll('#team article'));
-  const expected = [
-    {
-      name: 'Tejit Pabari',
-      bio: 'Engineer. 5+ years building cloud systems at Microsoft; Columbia CS (AI).',
-      linkedin: 'https://www.linkedin.com/in/tejitpabari/',
-    },
-    {
-      name: 'Gitika Bose',
-      bio: 'Researcher and data scientist at Bing, working on grounding, hallucination and fact-checking. Columbia CS, cum laude.',
-      linkedin: 'https://www.linkedin.com/in/gitikabose/',
-    },
-    {
-      name: 'Frédérique Escudier, Ph.D., Psy.D.',
-      bio: 'Clinical neuropsychologist, 15+ years in cognitive assessment. Former president, Quebec Association of Neuropsychologists.',
-      linkedin: 'https://www.linkedin.com/in/escudierfrederique/',
-    },
-  ];
-  expect(cards).toHaveLength(3);
-  expected.forEach((member, index) => {
-    const card = cards[index];
-    expect(card.querySelector('h3')?.textContent).toBe(member.name);
-    expect(card.textContent).toContain(member.bio);
-    const image = card.querySelector('img')!;
-    expect(image.alt).toBe(`Photo of ${member.name}`);
-    expect(image.width).toBe(320);
-    expect(image.height).toBe(320);
-    const link = card.querySelector('a')!;
-    expect(link.href).toBe(member.linkedin);
-    expect(link.getAttribute('aria-label')).toBe(`${member.name} on LinkedIn`);
-    expect(link.target).toBe('_blank');
-    expect(link.rel).toBe('noopener noreferrer');
-    expect(link.querySelector('svg')).not.toBeNull();
+  return new JSDOM(await container.renderToString(TeamSection)).window.document;
+}
+
+describe('team data', () => {
+  it('has lead + rest bios and no pronouns or badge fields', () => {
+    expect(team.map(({ name, lead, rest, linkedin }) => ({ name, lead, rest, linkedin }))).toEqual(expected);
+    for (const member of team) {
+      expect(Object.keys(member).sort()).toEqual(['lead', 'linkedin', 'name', 'photo', 'rest']);
+    }
   });
-  expect(cards[1].textContent).toContain('(she/her)');
-  expect(cards[2].querySelector('.badge')?.textContent).toBe('Neuropsychologist');
-  expect(doc.querySelector('#team')?.textContent).toContain(
-    'Backed by researchers from Harvard Medical School, Columbia University Vagelos College of Physicians and Surgeons and Massachusetts General Hospital.',
-  );
-  expect(doc.querySelectorAll('[data-open-popup]')).toHaveLength(1);
-  expect(doc.querySelector('[data-open-popup]')?.getAttribute('data-trigger')).toBe('team');
-  const questions = doc.querySelector('a[href^="mailto:"]')!;
-  expect(questions.textContent).toBe('Questions?');
-  expect(questions.getAttribute('href')).toBe('mailto:tejitpabari99@gmail.com');
+
+  it('structures the partner line with the three institutions bold', () => {
+    expect(partnerLine.map((part) => part.text).join('')).toBe('Backed by researchers from Harvard Medical School, Columbia Medical Center and Massachusetts General Hospital.');
+    expect(partnerLine.filter((part) => part.bold).map((part) => part.text)).toEqual(['Harvard Medical School', 'Columbia Medical Center', 'Massachusetts General Hospital']);
+  });
+});
+
+describe('team section', () => {
+  it('renders three cards with bold leads, photos and LinkedIn links, without pronouns or badges', async () => {
+    const doc = await render();
+    const cards = Array.from(doc.querySelectorAll('#team article'));
+    expect(cards).toHaveLength(3);
+    expected.forEach((member, index) => {
+      const card = cards[index];
+      expect(card.querySelector('h3')?.textContent).toBe(member.name);
+      const bio = card.querySelector('.bio')!;
+      expect(bio.textContent).toBe(member.lead + member.rest);
+      expect(bio.querySelector('strong')?.textContent).toBe(member.lead);
+      expect(bio.querySelectorAll('strong')).toHaveLength(1);
+      const image = card.querySelector('img')!;
+      expect(image.alt).toBe(`Photo of ${member.name}`);
+      expect(Number(image.getAttribute('width'))).toBeGreaterThanOrEqual(208);
+      expect(Number(image.getAttribute('height'))).toBeGreaterThanOrEqual(208);
+      const link = card.querySelector('a')!;
+      expect(link.href).toBe(member.linkedin);
+      expect(link.getAttribute('aria-label')).toBe(`${member.name} on LinkedIn`);
+      expect(link.target).toBe('_blank');
+      expect(link.rel).toBe('noopener noreferrer');
+      expect(link.querySelector('svg')).not.toBeNull();
+    });
+    expect(doc.querySelector('#team')?.textContent).not.toMatch(/she\/her|\(he|Neuropsychologist\b(?!,)/);
+    expect(doc.querySelector('#team .badge')).toBeNull();
+    expect(doc.querySelector('#team .pronouns')).toBeNull();
+  });
+
+  it('renders the partner line centered with bold institution names, one CTA and no Questions link', async () => {
+    const doc = await render();
+    const partners = doc.querySelector('#team .partners')!;
+    expect(partners.textContent).toBe('Backed by researchers from Harvard Medical School, Columbia Medical Center and Massachusetts General Hospital.');
+    expect(Array.from(partners.querySelectorAll('strong')).map((el) => el.textContent)).toEqual(['Harvard Medical School', 'Columbia Medical Center', 'Massachusetts General Hospital']);
+    const breaks = partners.querySelectorAll('br.desktop-break');
+    expect(breaks).toHaveLength(1);
+    expect(breaks[0].nextSibling?.textContent).toBe('and ');
+    expect(partners.querySelector('br.desktop-break')?.previousSibling?.textContent).toBe(' ');
+    expect(doc.querySelectorAll('[data-open-popup]')).toHaveLength(1);
+    expect(doc.querySelector('[data-open-popup]')?.getAttribute('data-trigger')).toBe('team');
+    expect(doc.querySelector('#team a[href^="mailto:"]')).toBeNull();
+    expect(doc.querySelector('#team')?.textContent).not.toContain('Questions?');
+  });
 });

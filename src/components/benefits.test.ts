@@ -30,7 +30,7 @@ describe('enterprise benefits', () => {
     const cta = section.querySelector('[data-open-popup]')!;
     expect(cta.textContent).toBe('Get early access');
     expect(cta.getAttribute('data-trigger')).toBe('section:benefits');
-    expect(section.lastElementChild).toBe(cta);
+    expect(section.querySelector('.container')?.lastElementChild?.lastElementChild).toBe(cta);
     expect(section.textContent).not.toMatch(/\$|accura|replace/i);
   });
 });

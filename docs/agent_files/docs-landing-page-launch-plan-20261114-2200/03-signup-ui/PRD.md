@@ -87,6 +87,7 @@ Upsert key is email+page, lowercased by the server. Sequence for a hero visitor:
 | 8 | Hero failure | Popup opens anyway; no inline error | Inline error blocks popup | Brief rule; user still can sign up |
 | 9 | Unset URL | Fake success in dev; failure in prod build | Always throw | Dev usable; prod can't silently succeed |
 | 10 | Honeypot hiding | Off-screen + `aria-hidden` + `inert` + tabindex -1 | `display:none` | Bots still fill it; invisible and unreachable to people and AT |
+| 11 | Optimistic popup (2026-11-15) | The popup opens immediately on a valid hero submit; step 1 posts in the background and step 2 awaits it | Wait for step 1 before opening | Apps Script latency (1-4s plus cold start) made the hero feel stuck. Hero shows a spinner, then a success line when step 1 resolves; a failure restores the button and shows an error. |
 
 ## Manual steps (owner-only)
 - Provide the deployed `PUBLIC_SIGNUP_URL` (SP02 handoff) and run/record the SP02 probe so `PUBLIC_SIGNUP_PLAN` is set correctly.

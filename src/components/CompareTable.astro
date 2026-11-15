@@ -6,53 +6,107 @@ interface Props {
   rows: readonly CompareRow[];
   highlight?: number;
   caption?: string;
+  /** Short option labels for the mobile tabs; defaults to the column names. */
+  shortColumns?: readonly string[];
+  /** Desktop widths in percent: criterion column first, then one per option. */
+  widths?: readonly number[];
+  idPrefix?: string;
 }
-const { columns, rows, highlight = columns.length - 1, caption = 'Comparison of evaluation options' } = Astro.props;
+const {
+  columns,
+  rows,
+  highlight = columns.length - 1,
+  caption = 'Comparison of evaluation options',
+  shortColumns = columns,
+  widths,
+  idPrefix = 'compare',
+} = Astro.props;
+const tabId = (i: number) => `${idPrefix}-tab-${i}`;
+const panelId = (i: number) => `${idPrefix}-panel-${i}`;
 ---
-<table role="table">
-  <caption>{caption}</caption>
-  <thead role="rowgroup">
-    <tr role="row">
-      <th scope="col" role="columnheader">Criterion</th>
-      {columns.map((column, index) => (
-        <th scope="col" role="columnheader" data-highlighted={index === highlight ? 'true' : undefined}>{column}</th>
-      ))}
-    </tr>
-  </thead>
-  <tbody role="rowgroup">
-    {rows.map((row) => (
-      <tr role="row">
-        <th scope="row" role="rowheader"><h3>{row.criterion}</h3></th>
-        {columns.map((column, index) => (
-          <td role="cell" data-highlighted={index === highlight ? 'true' : undefined}>
-            <span class="column-label" data-column-label aria-hidden="true">{column}</span>
-            {index === highlight
-              ? <strong data-value>{row.values[index] ?? '—'}</strong>
-              : <span data-value>{row.values[index] ?? '—'}</span>}
-          </td>
+<div class="cq">
+  <div class="tbl-wrap">
+    <table role="table">
+      <caption class="visually-hidden">{caption}</caption>
+      {widths && (
+        <colgroup>
+          {widths.map((width) => <col style={`width:${width}%`} />)}
+        </colgroup>
+      )}
+      <thead role="rowgroup">
+        <tr role="row">
+          <th scope="col" role="columnheader"><span class="visually-hidden">Criterion</span></th>
+          {columns.map((column, index) => (
+            <th scope="col" role="columnheader" data-highlighted={index === highlight ? 'true' : undefined}>{column}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+        {rows.map((row) => (
+          <tr role="row">
+            <th scope="row" role="rowheader"><h3>{row.criterion}</h3></th>
+            {columns.map((_, index) => (
+              <td role="cell" data-highlighted={index === highlight ? 'true' : undefined}>
+                {index === highlight
+                  ? <strong data-value>{row.values[index] ?? '—'}</strong>
+                  : <span data-value>{row.values[index] ?? '—'}</span>}
+              </td>
+            ))}
+          </tr>
         ))}
-      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cmp-m" data-compare-mobile data-tabs data-orientation="horizontal" data-active={highlight}>
+    <div class="cmp-tabs" role="tablist" aria-label="Compare options">
+      {columns.map((_, i) => (
+        <button type="button" class="ctab" role="tab" id={tabId(i)} aria-controls={panelId(i)} aria-selected={i === highlight ? 'true' : 'false'} tabindex={i === highlight ? 0 : -1}>{shortColumns[i] ?? columns[i]}</button>
+      ))}
+    </div>
+    {columns.map((column, i) => (
+      <div class="cpanel" role="tabpanel" id={panelId(i)} aria-labelledby={tabId(i)} tabindex="0" hidden={i !== highlight} inert={i !== highlight} data-highlighted={i === highlight ? 'true' : undefined} data-option={i}>
+        <p class="visually-hidden">{column}</p>
+        {rows.map((row) => (
+          <div class="crow" data-row><span>{row.criterion}</span><span class="v">{row.values[i] ?? '—'}</span></div>
+        ))}
+      </div>
     ))}
-  </tbody>
-</table>
+  </div>
+</div>
+
+<script>
+  import { initTabs } from '../lib/tabs';
+  initTabs();
+  document.addEventListener('astro:page-load', () => initTabs());
+</script>
 
 <style>
-  table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; margin-block: var(--space-6) var(--space-8); font-size: var(--font-size-sm); }
-  caption { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-  th, td { padding: var(--space-4); text-align: start; vertical-align: top; border-bottom: 1px solid var(--color-gray-300); overflow-wrap: anywhere; }
-  thead th { background: var(--color-gray-100); font-weight: 600; }
-  tbody th { font-weight: 600; }
-  h3 { margin: 0; font-size: inherit; line-height: inherit; }
-  .column-label { display: none; }
-  [data-highlighted="true"] { color: var(--color-accent); background: var(--color-score-good-background); }
-  @media (max-width: 639px) {
-    table, tbody, tr, th, td { display: block; min-width: 0; }
-    thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-    tbody { display: grid; gap: var(--space-4); }
-    tbody tr { border: 1px solid var(--color-gray-300); border-radius: var(--space-2); overflow: hidden; }
-    tbody th { background: var(--color-gray-100); }
-    td { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); }
-    td:last-child { border-bottom: 0; }
-    .column-label { display: block; font-weight: 600; }
+  .cq { container-type: inline-size; }
+  .tbl-wrap { background: #fff; border: 1px solid #c9e4d6; border-radius: 14px; overflow: hidden; }
+  table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 0.95rem 1.2rem; border-bottom: 1px solid #e3efe8; overflow-wrap: anywhere; vertical-align: top; }
+  tr:last-child td, tr:last-child th { border-bottom: 0; }
+  thead th { font-size: 0.85rem; color: var(--color-gray-600); font-weight: 600; background: var(--color-gray-50); }
+  tbody th { font-weight: 500; }
+  h3 { margin: 0; font-size: inherit; font-weight: inherit; line-height: inherit; letter-spacing: normal; }
+  td[data-highlighted='true'] { background: #eaf5f3; font-weight: 600; color: var(--color-accent); }
+  thead th[data-highlighted='true'] { background: var(--color-accent); color: #fff; }
+  td strong { font-weight: inherit; }
+  .cmp-m { display: none; }
+  .cmp-tabs { display: flex; gap: 4px; align-items: flex-end; }
+  .ctab { flex: 1 1 0; min-width: 0; font: inherit; font-weight: 600; font-size: 0.85rem; padding: 0.65rem 0.3rem; background: transparent; color: var(--color-gray-600); border: 1px solid transparent; border-bottom: 0; border-radius: 12px 12px 0 0; cursor: pointer; }
+  .ctab[aria-selected='true'] { background: #fff; color: var(--color-accent); border-color: #c9e4d6; margin-bottom: -1px; position: relative; z-index: 2; }
+  .cpanel { background: #fff; border: 1px solid #c9e4d6; border-radius: 14px; padding: 0.4rem 1rem; }
+  .cmp-m:has(.ctab:first-child[aria-selected='true']) .cpanel { border-top-left-radius: 0; }
+  .cmp-m:has(.ctab:last-child[aria-selected='true']) .cpanel { border-top-right-radius: 0; }
+  .crow { display: flex; justify-content: space-between; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid #e3efe8; font-size: 0.9rem; }
+  .crow:last-child { border-bottom: 0; }
+  .crow > span:first-child { color: var(--color-gray-600); flex: 1; }
+  .crow .v { font-weight: 600; text-align: right; }
+  .cpanel[data-highlighted='true'] .v { color: var(--color-accent); }
+  @container (max-width: 639px) {
+    .tbl-wrap { display: none; }
+    .cmp-m { display: block; }
   }
 </style>

@@ -3,29 +3,22 @@ import { describe, expect, it } from 'vitest';
 import { initTabs } from './tabs';
 
 function fixture() {
-  const markup = (prefix: string) => `<div data-feature-tabs>
-    <div role="tablist" aria-label="Features" aria-orientation="horizontal">
+  const markup = (prefix: string, orientation = 'horizontal') => `<div data-tabs data-orientation="${orientation}">
+    <div role="tablist" aria-label="Features">
       ${['evidence', 'complete', 'feedback'].map((name, index) => `<button role="tab" id="${prefix}-${name}-tab" aria-controls="${prefix}-${name}-panel" aria-selected="${index === 0}" tabindex="${index === 0 ? '0' : '-1'}">${name}</button>`).join('')}
     </div>
     ${['evidence', 'complete', 'feedback'].map((name) => `<div role="tabpanel" id="${prefix}-${name}-panel" aria-labelledby="${prefix}-${name}-tab">${name} content</div>`).join('')}
   </div>`;
-  const dom = new JSDOM(markup('learner') + markup('enterprise'));
-  let matches = false;
-  const listeners = new Set<() => void>();
-  Object.defineProperty(dom.window, 'matchMedia', { value: () => ({
-    get matches() { return matches; },
-    addEventListener: (_: string, listener: () => void) => listeners.add(listener),
-  }) });
-  const roots = Array.from(dom.window.document.querySelectorAll<HTMLElement>('[data-feature-tabs]'));
+  const dom = new JSDOM(markup('learner', 'vertical') + markup('enterprise'));
+  const roots = Array.from(dom.window.document.querySelectorAll<HTMLElement>('[data-tabs]'));
   initTabs(dom.window.document);
-  const resize = (desktop: boolean) => { matches = desktop; listeners.forEach((listener) => listener()); };
   const key = (root: HTMLElement, value: string) => {
     const active = root.querySelector<HTMLButtonElement>('[role="tab"][aria-selected="true"]')!;
     const event = new dom.window.KeyboardEvent('keydown', { key: value, bubbles: true, cancelable: true });
     active.dispatchEvent(event);
     return event;
   };
-  return { dom, roots, resize, key };
+  return { dom, roots, key };
 }
 
 function assertSelected(root: HTMLElement, index: number) {
@@ -34,10 +27,12 @@ function assertSelected(root: HTMLElement, index: number) {
   expect(tabs.map((tab) => tab.getAttribute('aria-selected'))).toEqual(tabs.map((_, i) => String(i === index)));
   expect(tabs.map((tab) => tab.tabIndex)).toEqual(tabs.map((_, i) => i === index ? 0 : -1));
   expect(panels.map((panel) => panel.hidden)).toEqual(panels.map((_, i) => i !== index));
+  expect(panels.map((panel) => panel.hasAttribute('inert'))).toEqual(panels.map((_, i) => i !== index));
+  expect(root.dataset.active).toBe(String(index));
 }
 
 describe('feature tabs', () => {
-  it('enhances each instance with Evidence selected and exactly one visible panel', () => {
+  it('enhances each instance with the first tab selected and exactly one visible panel', () => {
     const { roots } = fixture();
     for (const root of roots) {
       expect(root.dataset.enhanced).toBe('true');
@@ -72,13 +67,20 @@ describe('feature tabs', () => {
     assertSelected(roots[1], 0);
   });
 
-  it('updates orientation when the desktop media query changes', () => {
-    const { roots, resize } = fixture();
-    expect(roots[0].querySelector('[role="tablist"]')?.getAttribute('aria-orientation')).toBe('horizontal');
-    resize(true);
+  it('takes orientation from the data attribute and keeps arrows working on both axes', () => {
+    const { roots } = fixture();
     expect(roots[0].querySelector('[role="tablist"]')?.getAttribute('aria-orientation')).toBe('vertical');
-    resize(false);
-    expect(roots[0].querySelector('[role="tablist"]')?.getAttribute('aria-orientation')).toBe('horizontal');
+    expect(roots[1].querySelector('[role="tablist"]')?.getAttribute('aria-orientation')).toBe('horizontal');
+  });
+
+  it('switches to the narrow orientation when the root is narrower than the breakpoint', () => {
+    const dom = new JSDOM(`<div data-tabs data-orientation="vertical" data-orientation-narrow="horizontal" data-narrow-width="700">
+      <div role="tablist"><button role="tab" id="a" aria-controls="pa" aria-selected="true">a</button></div>
+      <div role="tabpanel" id="pa">a</div></div>`);
+    const root = dom.window.document.querySelector<HTMLElement>('[data-tabs]')!;
+    Object.defineProperty(root, 'clientWidth', { value: 500, configurable: true });
+    initTabs(dom.window.document);
+    expect(root.querySelector('[role="tablist"]')?.getAttribute('aria-orientation')).toBe('horizontal');
   });
 
   it('initializes a single root idempotently', () => {

@@ -1,5 +1,7 @@
 import { isValidEmail } from './body';
 import { postSignup } from './client';
+import { getPendingStep1 } from './pending';
+import { setSubmitting } from './spinner';
 import { track } from '../track';
 
 const initialized = new WeakSet<HTMLDialogElement>();
@@ -27,8 +29,7 @@ export function initSignupDialog(): void {
 
   function setBusy(value: boolean): void {
     busy = value;
-    button.disabled = value;
-    button.textContent = value ? 'Sending…' : 'Get early access';
+    setSubmitting(button, value);
     form.setAttribute('aria-busy', String(value));
   }
 
@@ -138,11 +139,16 @@ export function initSignupDialog(): void {
     const requestGeneration = generation;
     setBusy(true);
     const answers = Object.fromEntries(Array.from(fields, (field) => [field.name, field.value]));
+    // Keep step 1 before step 2 even though the popup opened before step 1 resolved.
+    const step1 = getPendingStep1();
+    if (step1) await step1.catch(() => undefined);
+    if (requestGeneration !== generation || !dialog.open) return;
     const result = await postSignup(2, { email: value, fields: answers, honeypot: honeypot.value });
     if (requestGeneration !== generation || !dialog.open) return;
     setBusy(false);
     if (result.ok) {
       track('signup_step2');
+      document.dispatchEvent(new CustomEvent('miti:signup-complete', { detail: { email: value } }));
       entry.hidden = true;
       success.hidden = false;
       dialog.setAttribute('aria-labelledby', successHeading.id);

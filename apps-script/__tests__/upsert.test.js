@@ -25,6 +25,64 @@ describe('Sheet header and upsert', () => {
     expect(harness.formats).toContainEqual({ row: 1, column: 1, numRows: 1000, numColumns: schema.length, format: '@' });
   });
 
+  it('applies the whole-sheet plain-text format only when header columns are created', () => {
+    const harness = createAppsScriptHarness();
+    harness.context.ensureHeader(harness.sheet);
+    const sheetWide = () => harness.formats.filter((format) => format.numRows === 1000);
+    expect(sheetWide()).toHaveLength(1);
+    harness.context.ensureHeader(harness.sheet);
+    save(harness, signup);
+    save(harness, { ...signup, step: 2, role: 'Researcher' }, later);
+    expect(sheetWide()).toHaveLength(1);
+  });
+
+  it('grows a full sheet before writing a new signup row', () => {
+    const harness = createAppsScriptHarness({ rows: [schema, ['t', 't', 'learner', '', 'x@y.co'], ['t', 't', 'learner', '', 'z@y.co']], maxRows: 3 });
+    expect(harness.sheet.getMaxRows()).toBe(3);
+    save(harness, signup);
+    expect(harness.sheet.getMaxRows()).toBe(4);
+    expect(record(harness, 4).email).toBe('a@b.co');
+    expect(harness.formats).toContainEqual({ row: 4, column: 1, numRows: 1, numColumns: schema.length, format: '@' });
+  });
+
+  it('updates an existing row writing only the changed cells', () => {
+    const harness = createAppsScriptHarness();
+    save(harness, signup);
+    const headers = harness.context.ensureHeader(harness.sheet);
+    harness.writes.length = 0;
+    const validated = harness.context.parseAndValidate(JSON.stringify({ ...signup, step: 2, role: 'Researcher', src: 'other' }));
+    harness.context.upsert(harness.sheet, validated.record, later, headers);
+    const columns = harness.writes.map((write) => schema[write.column - 1]).sort();
+    expect(columns).toEqual(['role', 'updated']);
+    expect(harness.writes.every((write) => write.numRows === 1 && write.numColumns === 1 && write.row === 2)).toBe(true);
+    expect(record(harness)).toMatchObject({ first_seen: first, updated: later, role: 'Researcher', src: 'newsletter' });
+  });
+
+  it('never writes owner formula columns or unchanged cells holding stored "=" text', () => {
+    const headers = ['owner_note', ...schema];
+    const row = { owner_note: '=SUM(1,2)', first_seen: first, updated: first, email: 'a@b.co', page: 'learner', src: 'newsletter', how_often: '=stored', role: 'old' };
+    const harness = createAppsScriptHarness({ rows: [headers, headers.map((header) => row[header] ?? '')] });
+    save(harness, { ...signup, role: 'new' }, later);
+    const touched = harness.writes.map((write) => headers[write.column - 1]);
+    expect(touched).not.toContain('owner_note');
+    expect(touched).not.toContain('how_often');
+    expect(touched).not.toContain('first_seen');
+    expect(touched.sort()).toEqual(['role', 'updated']);
+    expect(record(harness)).toMatchObject({ owner_note: '=SUM(1,2)', how_often: '=stored', role: 'new' });
+  });
+
+  it('formats the target row as plain text for appended and updated rows', () => {
+    const harness = createAppsScriptHarness();
+    save(harness, signup);
+    harness.formats.length = 0;
+    save(harness, { ...signup, email: 'new@b.co' }, later);
+    expect(harness.formats).toContainEqual({ row: 3, column: 1, numRows: 1, numColumns: schema.length, format: '@' });
+    harness.formats.length = 0;
+    save(harness, { ...signup, step: 2, role: 'x' }, later);
+    const roleColumn = schema.indexOf('role') + 1;
+    expect(harness.formats).toContainEqual({ row: 2, column: roleColumn, numRows: 1, numColumns: 1, format: '@' });
+  });
+
   it('appends missing headers without moving owner columns or existing rows', () => {
     const harness = createAppsScriptHarness({ rows: [['owner_note', 'email', 'page'], ['keep', 'a@b.co', 'learner']] });
     const expected = ['owner_note', 'email', 'page', ...schema.filter((column) => !['email', 'page'].includes(column))];

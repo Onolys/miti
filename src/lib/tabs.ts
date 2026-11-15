@@ -1,4 +1,4 @@
-const ROOT = '[data-feature-tabs]';
+const ROOT = '[data-tabs]';
 const initialized = new WeakSet<HTMLElement>();
 
 function initializeRoot(root: HTMLElement): void {
@@ -19,20 +19,25 @@ function initializeRoot(root: HTMLElement): void {
       const selected = i === index;
       tab.setAttribute('aria-selected', String(selected));
       tab.tabIndex = selected ? 0 : -1;
-      controlledPanels[i]!.hidden = !selected;
+      const panel = controlledPanels[i]!;
+      panel.hidden = !selected;
+      panel.toggleAttribute('inert', !selected);
     }
+    root.dataset.active = String(index);
     if (focus) tabs[index].focus();
   }
 
-  const view = root.ownerDocument.defaultView;
-  const desktop = view?.matchMedia?.('(min-width: 768px)');
+  // Orientation comes from data attributes, not a hard-coded viewport width:
+  // data-orientation, plus an optional narrow variant below data-narrow-width px of root width.
+  const narrowOrientation = root.dataset.orientationNarrow;
+  const narrowWidth = Number(root.dataset.narrowWidth ?? 0);
   const updateOrientation = () => {
-    const vertical = desktop ? desktop.matches : (view?.innerWidth ?? 0) >= 768;
-    tablist.setAttribute('aria-orientation', vertical ? 'vertical' : 'horizontal');
+    const narrow = Boolean(narrowOrientation) && narrowWidth > 0 && root.clientWidth > 0 && root.clientWidth <= narrowWidth;
+    const value = narrow ? narrowOrientation : root.dataset.orientation;
+    tablist.setAttribute('aria-orientation', value === 'vertical' ? 'vertical' : 'horizontal');
   };
   updateOrientation();
-  if (desktop) desktop.addEventListener('change', updateOrientation);
-  else view?.addEventListener('resize', updateOrientation);
+  if (narrowOrientation && typeof ResizeObserver !== 'undefined') new ResizeObserver(updateOrientation).observe(root);
 
   tablist.addEventListener('click', (event) => {
     const tab = (event.target as Element | null)?.closest<HTMLButtonElement>('[role="tab"]');

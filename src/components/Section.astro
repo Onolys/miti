@@ -4,24 +4,43 @@ interface Props {
   id: string;
   heading?: string;
   cta?: boolean;
+  tone?: 'hero' | 'features' | 'evaluates' | 'compare' | 'team' | 'benefits';
 }
-const { id, heading, cta = true } = Astro.props;
+const { id, heading, cta = true, tone = 'hero' } = Astro.props;
 ---
-<section id={id} aria-labelledby={heading ? `${id}-heading` : undefined}>
-  {heading && <h2 id={`${id}-heading`}>{heading}</h2>}
-  <slot />
-  {cta && <CtaButton trigger={`section:${id}`} />}
+<section id={id} data-tone={tone} aria-labelledby={heading ? `${id}-heading` : undefined}>
+  <div class="container">
+    {heading && <h2 id={`${id}-heading`}>{heading}</h2>}
+    <slot />
+    {cta && <div class="cta-row"><CtaButton trigger={`section:${id}`} /></div>}
+  </div>
 </section>
 
 <style>
   section {
-    width: min(100%, 72rem);
-    margin-inline: auto;
-    padding: var(--space-12) var(--gutter);
+    width: 100%;
+    padding-block: var(--space-16);
+    background: var(--tone-hero);
+    scroll-margin-top: calc(var(--hdr) + 8px);
   }
+  section[data-tone='features'] { background: var(--tone-features); }
+  section[data-tone='evaluates'] { background: var(--tone-evaluates); }
+  section[data-tone='compare'] { background: var(--tone-compare); }
+  section[data-tone='team'] { background: var(--tone-team); }
+  section[data-tone='benefits'] { background: var(--tone-benefits); }
 
   h2 {
-    font-size: var(--font-size-2xl);
+    font-size: clamp(1.6rem, 3.4vw, 2.25rem);
     line-height: var(--line-height-heading);
+  }
+
+  .cta-row {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-8);
+  }
+
+  @media (max-width: 47.5rem) {
+    section { padding-block: 3.25rem; }
   }
 </style>

@@ -13,7 +13,7 @@ describe('Apps Script request handlers', () => {
   it('returns saved JSON and flushes before releasing the acquired lock', () => {
     const harness = createAppsScriptHarness();
     expect(post(harness)).toEqual({ ok: true });
-    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 10000 }, 'flush', 'releaseLock']);
+    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 5000 }, 'flush', 'releaseLock']);
     expect(harness.sheet.getLastRow()).toBe(2);
     const values = harness.sheet.getDataRange().getValues();
     const saved = Object.fromEntries(values[0].map((header, column) => [header, values[1][column]]));
@@ -68,22 +68,22 @@ describe('Apps Script request handlers', () => {
     const harness = createAppsScriptHarness({ waitLockError: new Error('timed out') });
     const spreadsheet = vi.spyOn(harness.SpreadsheetApp, 'openById');
     expect(post(harness)).toEqual({ ok: false, error: 'busy' });
-    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 10000 }]);
+    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 5000 }]);
     expect(spreadsheet).not.toHaveBeenCalled();
   });
 
   it('maps write failure to server and releases the lock in finally', () => {
     const harness = createAppsScriptHarness();
-    vi.spyOn(harness.sheet, 'appendRow').mockImplementation(() => { throw new Error('write failed'); });
+    vi.spyOn(harness.sheet, 'getRange').mockImplementation(() => { throw new Error('write failed'); });
     expect(post(harness)).toEqual({ ok: false, error: 'server' });
-    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 10000 }, 'releaseLock']);
+    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 5000 }, 'releaseLock']);
   });
 
   it('maps flush failure to server and still releases the lock', () => {
     const harness = createAppsScriptHarness();
     vi.spyOn(harness.SpreadsheetApp, 'flush').mockImplementation(() => { throw new Error('flush failed'); });
     expect(post(harness)).toEqual({ ok: false, error: 'server' });
-    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 10000 }, 'releaseLock']);
+    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 5000 }, 'releaseLock']);
   });
 
   it('catches releaseLock failure and returns valid server JSON', () => {
@@ -111,7 +111,7 @@ describe('Apps Script request handlers', () => {
     const harness = createAppsScriptHarness();
     vi.spyOn(harness.SpreadsheetApp, 'openById').mockImplementation(() => { throw new Error('spreadsheet unavailable'); });
     expect(post(harness)).toEqual({ ok: false, error: 'server' });
-    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 10000 }, 'releaseLock']);
+    expect(harness.events).toEqual([{ type: 'waitLock', timeout: 5000 }, 'releaseLock']);
   });
 
   it('returns the exact healthcheck JSON', () => {

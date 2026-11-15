@@ -1,0 +1,27 @@
+---
+import { qcRows } from '../../data/features';
+---
+<div class="lbl">Score as coded vs supported by session</div>
+{qcRows.map((row) => (
+  <div class="card" data-qc-row>
+    <div class="card-h"><b>{row.criterion}</b><span class={`tag ${row.status === 'Supported' ? 'good' : 'low'}`}>{row.status}</span></div>
+    <div class="vals">
+      <span>Coded <b>{row.coded}</b></span>
+      <span aria-hidden="true">→</span>
+      <span>Supported by session <b>{row.supported}</b></span>
+      {row.lines && <code>{row.lines}</code>}
+    </div>
+  </div>
+))}
+
+<style>
+  .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-gray-600); font-weight: 600; }
+  .card { background: #fff; border: 1px solid var(--color-gray-100); border-radius: 10px; padding: 0.7rem 0.85rem; display: flex; flex-direction: column; gap: 0.45rem; }
+  .card-h { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+  .vals { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem; font-size: 0.85rem; color: var(--color-gray-600); }
+  .vals b { color: var(--color-text); font-variant-numeric: tabular-nums; }
+  .vals code { margin-left: auto; font: 600 0.72rem var(--font-family-sans); color: var(--color-accent); background: #d5ebe8; border-radius: 6px; padding: 0.05rem 0.4rem; }
+  .tag { font-size: 0.72rem; font-weight: 600; padding: 0.1rem 0.6rem; border-radius: 99px; }
+  .tag.good { color: var(--color-score-good); background: var(--color-score-good-background); }
+  .tag.low { color: var(--color-score-low); background: var(--color-score-low-background); }
+</style>

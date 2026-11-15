@@ -6,13 +6,15 @@ const codePath = new URL('../Code.gs', import.meta.url);
 
 export function createAppsScriptHarness({
   rows = [], sheetExists = true, waitLockError,
-  activeSpreadsheet = false, configured = true, spreadsheetId = 'test-spreadsheet-id',
+  activeSpreadsheet = false, configured = true, maxRows: initialMaxRows = 1000, spreadsheetId = 'test-spreadsheet-id',
 } = {}) {
   const cells = rows.map((row) => [...row]);
   const events = [];
   const outputs = [];
   const formats = [];
+  const writes = [];
   let existingSheet = sheetExists;
+  let maxRows = Math.max(initialMaxRows, cells.length);
 
   const sheet = {
     getLastRow() {
@@ -24,11 +26,21 @@ export function createAppsScriptHarness({
         last,
       ), 0);
     },
-    getMaxRows: () => Math.max(1000, cells.length),
+    getMaxRows: () => maxRows,
+    insertRowsAfter(after, howMany) {
+      if (!Number.isInteger(after) || after < 0 || after > maxRows || !Number.isInteger(howMany) || howMany < 1) {
+        throw new Error('Invalid insertRowsAfter arguments');
+      }
+      maxRows += howMany;
+      return sheet;
+    },
     getMaxColumns: () => Math.max(26, sheet.getLastColumn()),
     getRange(row, column, numRows = 1, numColumns = 1) {
       if (![row, column, numRows, numColumns].every((value) => Number.isInteger(value) && value > 0)) {
         throw new Error('Range coordinates and dimensions must be positive integers');
+      }
+      if (row + numRows - 1 > maxRows || column + numColumns - 1 > sheet.getMaxColumns()) {
+        throw new Error('The coordinates of the range are outside the dimensions of the sheet.');
       }
       const range = {
         getValues() {
@@ -45,6 +57,7 @@ export function createAppsScriptHarness({
           if (values.length !== numRows || values.some((valuesRow) => valuesRow.length !== numColumns)) {
             throw new Error('Values must match the range dimensions');
           }
+          writes.push({ row, column, numRows, numColumns });
           values.forEach((valuesRow, rowOffset) => {
             const target = cells[row - 1 + rowOffset] ??= [];
             valuesRow.forEach((value, columnOffset) => {
@@ -67,6 +80,7 @@ export function createAppsScriptHarness({
       return sheet.getRange(1, 1, Math.max(1, sheet.getLastRow()), Math.max(1, sheet.getLastColumn()));
     },
     appendRow(values) {
+      if (sheet.getLastRow() + 1 > maxRows) maxRows = sheet.getLastRow() + 1; // appendRow auto-grows in Apps Script
       cells[sheet.getLastRow()] = [...values];
       return sheet;
     },
@@ -135,7 +149,7 @@ export function createAppsScriptHarness({
   const context = vm.createContext({ SpreadsheetApp, PropertiesService, LockService, ContentService });
   vm.runInContext(readFileSync(codePath, 'utf8'), context, { filename: 'Code.gs' });
 
-  return { context, sheet, spreadsheet, lock, scriptProperties, SpreadsheetApp, PropertiesService, LockService, ContentService, events, outputs, formats };
+  return { context, sheet, spreadsheet, lock, scriptProperties, SpreadsheetApp, PropertiesService, LockService, ContentService, events, outputs, formats, writes };
 }
 
 function isPopulated(value) {

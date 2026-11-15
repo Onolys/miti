@@ -6,6 +6,22 @@ export type SignupResult =
   | { ok: false; error: string };
 
 let warnedAboutMissingUrl = false;
+let warmedUp = false;
+
+// Must stay above Code.gs LockService.waitLock (5000 ms) plus network margin,
+// so a server-side 'busy' reply can arrive and the retry can run.
+export const REQUEST_TIMEOUT_MS = 12_000;
+
+// Fire-and-forget GET that wakes the Apps Script instance. Once per page load.
+export function warmUp(): void {
+  if (warmedUp || !SIGNUP_URL) return;
+  warmedUp = true;
+  try {
+    fetch(SIGNUP_URL, { method: 'GET', mode: 'no-cors', redirect: 'follow' }).catch(() => {});
+  } catch {
+    // Ignore: warming up is best effort.
+  }
+}
 
 function delay(milliseconds: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -18,7 +34,7 @@ async function send(body: string): Promise<SignupResult> {
     timer = setTimeout(() => {
       controller.abort();
       reject(new Error('Signup request timed out'));
-    }, 10_000);
+    }, REQUEST_TIMEOUT_MS);
   });
 
   async function request(): Promise<SignupResult> {

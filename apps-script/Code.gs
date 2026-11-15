@@ -69,8 +69,9 @@ function ensureHeader(sheet) {
   if (missing.length) {
     sheet.getRange(1, headers.length + 1, 1, missing.length).setValues([missing]);
     headers = headers.concat(missing);
+    // Plain-text format only when columns were just created; not on every request.
+    sheet.getRange(1, 1, sheet.getMaxRows(), headers.length).setNumberFormat('@');
   }
-  sheet.getRange(1, 1, sheet.getMaxRows(), headers.length).setNumberFormat('@');
   return headers;
 }
 
@@ -92,21 +93,34 @@ function upsert(sheet, record, now, headers) {
     }
   }
   if (!matchedRow) {
-    sheet.appendRow(headers.map(function (name) {
+    var values = headers.map(function (name) {
       if (name === 'first_seen' || name === 'updated') return timestamp;
       if (SIGNUP_COLUMNS.indexOf(name) === -1 || record[name] == null) return '';
       return name === 'email' ? record[name] : formulaSafe(record[name]);
-    }));
+    });
+    // Plain-text format on the target row first, so appended rows are never auto-parsed.
+    // getRange throws past the sheet's last row, so grow the sheet before writing.
+    var newRow = sheet.getLastRow() + 1;
+    if (newRow > sheet.getMaxRows()) sheet.insertRowsAfter(sheet.getMaxRows(), 1);
+    sheet.getRange(newRow, 1, 1, headers.length)
+      .setNumberFormat('@').setValues([values]);
     return;
   }
 
-  sheet.getRange(matchedRow, headers.indexOf('updated') + 1).setValue(timestamp);
+  // One read to decide; write only the signup cells this request changes.
+  // Never write the whole row back: that would flatten owner formulas and revive
+  // stored text beginning with "=" (the quote prefix is not returned by getValues).
+  var row = sheet.getRange(matchedRow, 1, 1, headers.length).getValues()[0];
+  var writes = [['updated', timestamp]];
   SIGNUP_COLUMNS.forEach(function (name) {
-    if (name === 'first_seen' || name === 'updated' ||
+    if (name === 'first_seen' || name === 'updated' || name === 'email' || name === 'page' ||
         record[name] == null || record[name] === '') return;
-    var cell = sheet.getRange(matchedRow, headers.indexOf(name) + 1);
-    if (name === 'src' && cell.getValue() !== '') return;
-    cell.setValue(name === 'email' ? record[name] : formulaSafe(record[name]));
+    if (name === 'src' && row[headers.indexOf(name)] !== '') return;
+    writes.push([name, formulaSafe(record[name])]);
+  });
+  writes.forEach(function (write) {
+    sheet.getRange(matchedRow, headers.indexOf(write[0]) + 1)
+      .setNumberFormat('@').setValue(write[1]);
   });
 }
 
@@ -138,7 +152,7 @@ function doPost(event) {
 
     var lock = LockService.getScriptLock();
     try {
-      lock.waitLock(10000);
+      lock.waitLock(5000);
     } catch (timeout) {
       return jsonResponse({ ok: false, error: 'busy' });
     }
