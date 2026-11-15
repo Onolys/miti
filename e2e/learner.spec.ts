@@ -64,7 +64,7 @@ test('desktop comparison table has the new rows, values and column widths', asyn
   await expect(table).toBeVisible();
   await expect(page.locator('#compare [data-compare-mobile]')).toBeHidden();
   await expect(table.locator('thead th')).toHaveText(['Criterion', 'Human MITI coding', 'AI practice chatbots', 'Onolys']);
-  await expect(table.locator('tbody th')).toHaveText(['Your own session', 'Full MITI 4.2.1 incl. global ratings', 'Evidence for every score', 'Session length', 'Cost', 'Turnaround']);
+  await expect(table.locator('tbody th')).toHaveText(['Your own session', 'Full MITI 4.2.1', 'Evidence for every score', 'Session length', 'Cost', 'Turnaround']);
   await expect(table.locator('tbody [data-value]')).toHaveText([
     'Yes', 'No, a simulated chat', 'Yes',
     'Yes', 'No, "MITI-informed"', 'Yes',

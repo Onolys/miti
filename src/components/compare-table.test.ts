@@ -8,7 +8,7 @@ import type { CompareRow } from '../lib/compare';
 
 const expectedRows = [
   { criterion: 'Your own session', values: ['Yes', 'No, a simulated chat', 'Yes'] },
-  { criterion: 'Full MITI 4.2.1 incl. global ratings', values: ['Yes', 'No, "MITI-informed"', 'Yes'] },
+  { criterion: 'Full MITI 4.2.1', values: ['Yes', 'No, "MITI-informed"', 'Yes'] },
   { criterion: 'Evidence for every score', values: ['Sometimes', 'Rarely', 'Yes'] },
   { criterion: 'Session length', values: ['Full session', 'Limited, short chats', 'Full session'] },
   { criterion: 'Cost', values: ['$40–$80 per session', 'Expensive subscriptions', 'Low (pricing coming soon)'] },
