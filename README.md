@@ -25,3 +25,14 @@ Both deployment jobs use the repository secret `FIREBASE_SERVICE_ACCOUNT`. To re
 Both deployment jobs validate the public configuration before building. The production job writes credentials only to a private file in the runner's temporary directory and removes that file after success or failure. The preview job uses the official Firebase Hosting action pinned to an immutable commit and Firebase CLI `15.36.0`; only that job receives permission to publish its check and PR comment. No credential file is uploaded as an artifact. The real Apps Script deployment and GA4 setup remain prerequisites; custom domains still require their separate owner setup.
 
 For local production builds, copy `.env.example` to `.env.local` and fill in the public values, then run `npm run build:prod`. `npm run deploy` performs that guarded build before deploying both Hosting targets with your local Firebase authentication. `npm run build` remains available without production configuration.
+
+## Claude Code skills (thepass)
+
+Open this repo in Claude Code and trust the folder: it prompts to install the `thepass` marketplace and plugin (declared in `.claude/settings.json`).
+
+Manual fallback:
+
+```
+/plugin marketplace add tejitpabari99/thepass
+/plugin install thepass@thepass
+```
